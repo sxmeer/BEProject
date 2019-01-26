@@ -8,12 +8,12 @@ import { AdminloginserviceService } from '../../adminloginservice.service';
 })
 export class AddcontributorComponent implements OnInit {
   selectedContributor = {
-    id: "",
-    name: "",
-    password: "",
-    password2:"",
-    subjectsAssigned: ""
-  }
+    id: '',
+    name: '',
+    password: '',
+    password2: '',
+    subjectsAssigned: ''
+  };
   constructor(private adminloginservice: AdminloginserviceService) {
   }
   ngOnInit() {
@@ -21,6 +21,6 @@ export class AddcontributorComponent implements OnInit {
   onSubmit() {
     this.adminloginservice.postContributor(this.selectedContributor).subscribe((res) => {
       alert(res);
-    })
+    });
   }
 }

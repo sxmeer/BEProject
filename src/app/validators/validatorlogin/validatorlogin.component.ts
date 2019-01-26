@@ -9,24 +9,23 @@ import { ValidatorloginserviceService } from '../validatorloginservice.service';
 })
 export class ValidatorloginComponent implements OnInit {
   user = {
-    id: "",
-    password: ""
-  }
+    id: '',
+    password: ''
+  };
 
-  constructor(private loginService: ValidatorloginserviceService, private router:Router) { }
+  constructor(private loginService: ValidatorloginserviceService, private router: Router) { }
 
   ngOnInit() {
-    this.loginService.authStatus.subscribe((msg)=>{
-      if(msg){
+    this.loginService.authStatus.subscribe((msg) => {
+      if (msg) {
         this.router.navigate(['/validators', 'homepage']);
       }
-    })
+    });
   }
   onSubmit() {
-    if (this.user.id == "" || this.user.password == "") {
-      alert("enter necessary details");
-    }
-    else{
+    if (this.user.id === '' || this.user.password === '') {
+      alert('enter necessary details');
+    } else {
       this.loginService.loginUser(this.user);
     }
   }
