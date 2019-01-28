@@ -30,8 +30,8 @@ export class ValidatorloginserviceService {
         }
       },
         (err) => {
-          alert("no such user");
-        })
+          alert('no such user');
+        });
   }
   logout() {
     this.token = null;

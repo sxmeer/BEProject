@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AdminloginserviceService {
-  authenticated: boolean = false;
+  authenticated = false;
   private token: string;
   authStatus = new Subject<Boolean>();
   constructor(private http: HttpClient, private router: Router) { }
@@ -25,12 +25,12 @@ export class AdminloginserviceService {
     return this.http.post('http://localhost:3000/admin/homepage/addvalidators', validators);
   }
   postContributor(contributors) {
-    return this.http.post('http://localhost:3000/admin/homepage/addcontributors',contributors);
+    return this.http.post('http://localhost:3000/admin/homepage/addcontributors', contributors);
   }
   postCourses(courseDetails) {
-    return this.http.post('http://localhost:3000/admin/homepage/addcourses',courseDetails);
+    return this.http.post('http://localhost:3000/admin/homepage/addcourses', courseDetails);
   }
-  
+
   loginUser(user) {
     console.log(user);
     this.http.post<{ token: string }>('http://localhost:3000/admin/login', user)
@@ -43,14 +43,14 @@ export class AdminloginserviceService {
           this.authStatus.next(true);
         }
       },
-      (err)=>{
-          alert("no such user");
-      })
+      (err) => {
+          alert('no such user');
+      });
 
   }
   logout() {
     this.token = null;
-    this.authenticated=false;
+    this.authenticated = false;
     this.authStatus.next(false);
     this.router.navigate(['/']);
   }

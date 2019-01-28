@@ -9,9 +9,9 @@ import { ContributorloginserviceService } from '../contributorloginservice.servi
 })
 export class ContributorloginComponent implements OnInit {
   user = {
-    id: "",
-    password: ""
-  }
+    id: '',
+    password: ''
+  };
   constructor(private loginService: ContributorloginserviceService, private router: Router) { }
 
   ngOnInit() {
@@ -19,13 +19,12 @@ export class ContributorloginComponent implements OnInit {
       if (msg) {
         this.router.navigate(['/contributors', 'homepage']);
       }
-    })
+    });
   }
   onSubmit() {
-    if (this.user.id == "" || this.user.password == "") {
-      alert("enter necessary details");
-    }
-    else {
+    if (this.user.id === '' || this.user.password === '') {
+      alert('enter necessary details');
+    } else {
       this.loginService.loginUser(this.user);
     }
   }
