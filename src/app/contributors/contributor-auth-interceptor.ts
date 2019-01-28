@@ -9,7 +9,7 @@ import { ContributorloginserviceService } from "./contributorloginservice.servic
 
 @Injectable()
 export class ContributorAuthInterceptor implements HttpInterceptor {
-  constructor(private loginService: ContributorloginserviceService) {}
+  constructor(private loginService: ContributorloginserviceService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler) {
     const authToken = this.loginService.getToken();

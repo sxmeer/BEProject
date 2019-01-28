@@ -21,6 +21,8 @@ import { AdminAuthGuardService } from './admin/admin-auth-gaurd.service';
 import { AddcontributorComponent } from './admin/adminhomepage/addcontributor/addcontributor.component';
 import { AddvalidatorComponent } from './admin/adminhomepage/addvalidator/addvalidator.component';
 import { AddcourseComponent } from './admin/adminhomepage/addcourse/addcourse.component';
+import { ContributormoduledescriptionComponent } from './contributors/contributorhomepage/contributormoduledescription/contributormoduledescription.component';
+import { ContributorquestionComponent } from './contributors/contributorhomepage/contributorquestion/contributorquestion.component';
 
 const routes: Routes = [
   { path: 'admin/login', component: AdminloginComponent },
@@ -47,7 +49,9 @@ const routes: Routes = [
     AdminhomepageComponent,
     AddcontributorComponent,
     AddvalidatorComponent,
-    AddcourseComponent
+    AddcourseComponent,
+    ContributormoduledescriptionComponent,
+    ContributorquestionComponent
   ],
   imports: [
     BrowserModule,

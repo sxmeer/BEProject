@@ -1,3 +1,15 @@
-<p>
-  contributorhomepage works!
-</p>
+<div class="row">
+  <div class="col">
+    <div class="container">
+      <app-contributormoduledescription></app-contributormoduledescription>
+    </div>
+  </div>
+  <div class="col">
+    <button (click)="addQuestion()">Add Question Component</button>
+    <div id="question-container">
+      <app-contributorquestion *ngFor="let question of questionList" [id]="question" (removeEmitter)="remover($event)">
+      </app-contributorquestion>
+    </div>
+    <button (click)="submitQuestions()">Submit</button>
+  </div>
+</div>

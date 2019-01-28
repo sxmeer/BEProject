@@ -12,11 +12,11 @@ export class ContributorloginComponent implements OnInit {
     id: "",
     password: ""
   }
-  constructor(private loginService: ContributorloginserviceService, private router:Router) { }
+  constructor(private loginService: ContributorloginserviceService, private router: Router) { }
 
   ngOnInit() {
-    this.loginService.authStatus.subscribe((msg)=>{
-      if(msg){
+    this.loginService.authStatus.subscribe((msg) => {
+      if (msg) {
         this.router.navigate(['/contributors', 'homepage']);
       }
     })
@@ -25,7 +25,7 @@ export class ContributorloginComponent implements OnInit {
     if (this.user.id == "" || this.user.password == "") {
       alert("enter necessary details");
     }
-    else{
+    else {
       this.loginService.loginUser(this.user);
     }
   }
