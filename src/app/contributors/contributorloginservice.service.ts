@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class ContributorloginserviceService {
+  authenticated:boolean = false;
   private token: string;
   authStatus = new Subject<Boolean>();
   readonly baseURL = 'http://localhost:3000/contributors/login';
@@ -14,6 +15,9 @@ export class ContributorloginserviceService {
 
   getToken() {
     return this.token;
+  }
+  getAuthentication(){
+    return this.authenticated;
   }
   getAuthStatus() {
     return this.authStatus.asObservable();
@@ -26,6 +30,7 @@ export class ContributorloginserviceService {
         const token = response.token;
         this.token = token;
         if (token) {
+          this.authenticated=true;
           this.authStatus.next(true);
         }
       },
@@ -35,6 +40,7 @@ export class ContributorloginserviceService {
   }
   logout() {
     this.token = null;
+    this.authenticated=false;
     this.authStatus.next(false);
     this.router.navigate(['/']);
   }

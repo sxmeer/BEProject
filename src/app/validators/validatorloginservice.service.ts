@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 })
 export class ValidatorloginserviceService {
   private token: string;
+  authenticated:boolean=false;
   authStatus = new Subject<Boolean>();
   readonly baseURL = 'http://localhost:3000/validators/login';
   constructor(private http: HttpClient, private router: Router) { }
@@ -18,6 +19,9 @@ export class ValidatorloginserviceService {
   getAuthStatus() {
     return this.authStatus.asObservable();
   }
+  getAuthentication(){
+    return this.authenticated;
+  }
   loginUser(user) {
     console.log(user);
     this.http.post<{ token: string }>(this.baseURL, user)
@@ -26,6 +30,7 @@ export class ValidatorloginserviceService {
         const token = response.token;
         this.token = token;
         if (token) {
+          this.authenticated=true;
           this.authStatus.next(true);
         }
       },
@@ -35,6 +40,7 @@ export class ValidatorloginserviceService {
   }
   logout() {
     this.token = null;
+    this.authenticated=false;
     this.authStatus.next(false);
     this.router.navigate(['/']);
   }

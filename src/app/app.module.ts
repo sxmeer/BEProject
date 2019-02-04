@@ -23,6 +23,8 @@ import { AddvalidatorComponent } from './admin/adminhomepage/addvalidator/addval
 import { AddcourseComponent } from './admin/adminhomepage/addcourse/addcourse.component';
 import { ContributormoduledescriptionComponent } from './contributors/contributorhomepage/contributormoduledescription/contributormoduledescription.component';
 import { ContributorquestionComponent } from './contributors/contributorhomepage/contributorquestion/contributorquestion.component';
+import { ContributorAuthGuardService } from './contributors/contributor-auth-gaurd.service';
+import { ValidatorAuthGuardService } from './validators/validator-auth-gaurd.service';
 
 const routes: Routes = [
   { path: 'admin/login', component: AdminloginComponent },
@@ -32,9 +34,9 @@ const routes: Routes = [
     { path: 'addcontributors', component: AddcontributorComponent }
   ], canActivate:[AdminAuthGuardService] },
   { path: 'validators/login', component: ValidatorloginComponent },
-  { path: 'validators/homepage', component: ValidatorhomepageComponent },
+  { path: 'validators/homepage', component: ValidatorhomepageComponent, canActivate:[ValidatorAuthGuardService]},
   { path: 'contributors/login', component: ContributorloginComponent },
-  { path: 'contributors/homepage', component: ContributorhomepageComponent },
+  { path: 'contributors/homepage', component: ContributorhomepageComponent, canActivate:[ContributorAuthGuardService] },
 ]
 
 @NgModule({

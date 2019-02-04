@@ -6,6 +6,7 @@ const Admin = require('../models/admin');
 var Validators = require('../models/validators');
 var Contributors = require('../models/contributors');
 var Courses = require('../models/courses');
+var checkAuth = require('./middleware/admin-check-auth');
 
 router.post("/login", (req, res, next) => {
     let fetchedUser;
@@ -43,7 +44,7 @@ router.post("/login", (req, res, next) => {
 });
 
 
-router.post("/homepage/addvalidators", (req, res, next) => {
+router.post("/homepage/addvalidators", checkAuth,(req, res, next) => {
     const name = req.body.name;
     const id = req.body.id;
     const subjectsAssigned = req.body.subjectsAssigned;
@@ -86,7 +87,7 @@ router.post("/homepage/addvalidators", (req, res, next) => {
     }
 });
 
-router.post('/homepage/addcontributors', function (req, res) {
+router.post('/homepage/addcontributors',checkAuth, function (req, res) {
     const name = req.body.name;
     const id = req.body.id;
     const subjectsAssigned = req.body.subjectsAssigned;
@@ -130,7 +131,7 @@ router.post('/homepage/addcontributors', function (req, res) {
     }
 });
 
-router.post('/homepage/addcourses', (req, res, next) => {
+router.post('/homepage/addcourses', checkAuth,(req, res, next) => {
     var courses = new Courses({
         subName: req.body.subName,
         subId: req.body.subId,
