@@ -9,6 +9,8 @@ import { HttpClient } from '@angular/common/http';
 export class ContributorloginserviceService {
   authenticated:boolean = false;
   private token: string;
+  private id: string;
+  private subjectsAssigned:string;
   authStatus = new Subject<Boolean>();
   readonly baseURL = 'http://localhost:3000/contributors/login';
   constructor(private http: HttpClient, private router: Router) { }
@@ -22,14 +24,23 @@ export class ContributorloginserviceService {
   getAuthStatus() {
     return this.authStatus.asObservable();
   }
+  getid(){
+    return this.id;
+  }
+  getSubjectsAssigned(){
+    return this.subjectsAssigned;
+  }
   loginUser(user) {
     console.log(user);
-    this.http.post<{ token: string }>(this.baseURL, user)
+    this.http.post<{ token: string, id:string, subjectsAssigned:string }>(this.baseURL, user)
       .subscribe((response) => {
         console.log(response);
         const token = response.token;
         this.token = token;
         if (token) {
+          console.log(response);
+          this.id=response.id;
+          this.subjectsAssigned=response.subjectsAssigned;
           this.authenticated=true;
           this.authStatus.next(true);
         }

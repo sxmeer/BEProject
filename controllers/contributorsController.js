@@ -2,9 +2,9 @@ const express = require('express');
 var router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
+var Courses = require('../models/courses');
 
-var  Contributors  = require('../models/contributors');
-
+var Contributors = require('../models/contributors');
 
 router.post("/login", (req, res, next) => {
     let fetchedUser;
@@ -31,6 +31,8 @@ router.post("/login", (req, res, next) => {
             );
             res.status(200).json({
                 token: token,
+                id: fetchedUser.id,
+                subjectsAssigned: fetchedUser.subjectsAssigned,
                 expiresIn: 3600
             });
         })
@@ -41,49 +43,55 @@ router.post("/login", (req, res, next) => {
         });
 });
 
-
-router.post('/', function (req, res) {
-    const name = req.body.name;
-    const id = req.body.email;
-    const subjectsAssigned = req.body.subjectsAssigned;
-    const password = req.body.password;
-    const password2 = req.body.password2;
-    req.checkBody('name', 'Name is required').notEmpty();
-    req.checkBody('subjectsAssigned', 'subject is required').notEmpty();
-    req.checkBody('id', 'Id is required').notEmpty();
-    req.checkBody('password', 'Password is required').notEmpty();
-    req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
-
-    let errors = req.validationErrors();
-    if (errors) {
-        res.json({
-            err: errors
+router.get('/courseDetail', function (req, res) {
+    id = req.query.id;
+    Courses.findOne({ subId: id })
+        .then((subjectDetail)=>{
+            res.status(200).json(subjectDetail);
         });
-    } else {
-        let contributor = new Contributors({
-            name: name,
-            id: id,
-            subjectsAssigned: subjectsAssigned,
-            password: password
-        });
-        bcrypt.genSalt(10, function (err, salt) {
-            bcrypt.hash(contributor.password, salt, function (err, hash) {
-                if (err) {
-                    console.log(err);
-                }
-                contributor.password = hash;
-                contributor.save(function (err) {
-                    if (err) {
-                        console.log(err)
-                        res.json({ err: "error" })
-                        return;
-                    } else {
-                        res.json({ msg: "registered" })
-                    }
-                });
-            });
-        });
-    }
 });
+// router.post('/', function (req, res) {
+//     const name = req.body.name;
+//     const id = req.body.email;
+//     const subjectsAssigned = req.body.subjectsAssigned;
+//     const password = req.body.password;
+//     const password2 = req.body.password2;
+//     req.checkBody('name', 'Name is required').notEmpty();
+//     req.checkBody('subjectsAssigned', 'subject is required').notEmpty();
+//     req.checkBody('id', 'Id is required').notEmpty();
+//     req.checkBody('password', 'Password is required').notEmpty();
+//     req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
+
+//     let errors = req.validationErrors();
+//     if (errors) {
+//         res.json({
+//             err: errors
+//         });
+//     } else {
+//         let contributor = new Contributors({
+//             name: name,
+//             id: id,
+//             subjectsAssigned: subjectsAssigned,
+//             password: password
+//         });
+//         bcrypt.genSalt(10, function (err, salt) {
+//             bcrypt.hash(contributor.password, salt, function (err, hash) {
+//                 if (err) {
+//                     console.log(err);
+//                 }
+//                 contributor.password = hash;
+//                 contributor.save(function (err) {
+//                     if (err) {
+//                         console.log(err)
+//                         res.json({ err: "error" })
+//                         return;
+//                     } else {
+//                         res.json({ msg: "registered" })
+//                     }
+//                 });
+//             });
+//         });
+//     }
+// });
 
 module.exports = router;
