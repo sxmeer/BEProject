@@ -5,35 +5,37 @@
       <input type="text" [(ngModel)]="question" class="form-control" [disabled]="disabled">
       <div class="form-group">
         <label for="mark">Mark</label>
-        <select class="form-control" [(ngModel)]="mark" name="mark" [disabled]="disabled" >
-            <option>3</option>
+        <select class="form-control" [(ngModel)]="mark" name="mark" [disabled]="disabled">
+          <!-- <option>3</option>
             <option>5</option>
             <option>8</option>
-            <option>10</option>
-          </select>
-          <label for="module">module number</label>
-        <select class="form-control" [(ngModel)]="module" name="mark" [disabled]="disabled">
-          <option>1</option>
+            <option>10</option> -->
+          <option *ngFor="let number of subjectDetail?.marksType" [ngValue]="number">{{number}}</option>
+        </select>
+        <label for="module">module number</label>
+        <select class="form-control" [(ngModel)]="module" name="module" [disabled]="disabled">
+          <!-- <option>1</option>
           <option>2</option>
           <option>3</option>
           <option>4</option>
-          <option>5</option>
+          <option>5</option> -->
+          <option *ngFor="let number of subjectDetail?.moduleDetails ; let i = index" [ngValue]="i+1">{{i+1}}</option>
         </select>
-        <label for="difficulty"  >Difficulty Level</label>
+        <label for="difficulty">Difficulty Level</label>
         <select class="form-control" [(ngModel)]="difficulty" name="difficulty" [disabled]="disabled">
-          <option>Hard</option>
-          <option>easy</option>
-          <option>medium</option>
+          <option [ngValue]="1">Easy</option>
+          <option [ngValue]="2">Medium</option>
+          <option [ngValue]="3">Hard</option>
         </select>
-        <label for="cognitive" >Cognitive Level</label>
+        <label for="cognitive">Cognitive Level</label>
         <select class="form-control" [(ngModel)]="cognitive" name="cognitive" [disabled]="disabled">
-          <option>knowledge</option>
-          <option>Comprehension</option>
-          <option>Application</option>
+          <option [ngValue]="3">Knowledge</option>
+          <option [ngValue]="2">Comprehension</option>
+          <option [ngValue]="1">Application</option>
         </select>
         <button type="button" *ngIf="!disabled" class="btn btn-success" (click)="lock()">lock</button>
         <button type="button" *ngIf="disabled" class="btn btn-secondary" (click)="unlock()">Unlock</button>
-        <button type="button"  class="btn btn-danger" (click)="remove(child)">remove</button>
+        <button type="button" class="btn btn-danger" (click)="remove(child)">remove</button>
       </div>
     </div>
   </div>
