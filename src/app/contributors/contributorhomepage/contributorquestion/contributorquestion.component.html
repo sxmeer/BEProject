@@ -33,9 +33,9 @@
           <option [ngValue]="2">Comprehension</option>
           <option [ngValue]="1">Application</option>
         </select>
-        <button type="button" *ngIf="!disabled" class="btn btn-success" (click)="lock()">lock</button>
-        <button type="button" *ngIf="disabled" class="btn btn-secondary" (click)="unlock()">Unlock</button>
-        <button type="button" class="btn btn-danger" (click)="remove(child)">remove</button>
+        <button type="button" *ngIf="!disabled" class="btn btn-success mt-2 mr-2" (click)="lock()">lock</button>
+        <button type="button" *ngIf="disabled" class="btn btn-secondary mt-2 mr-2" (click)="unlock()">Unlock</button>
+        <button type="button" class="btn btn-danger mt-2 mr-2" (click)="remove(child)">remove</button>
       </div>
     </div>
   </div>
