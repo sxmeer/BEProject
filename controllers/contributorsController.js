@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 var Courses = require('../models/courses');
 
+var Questions = require('../models/questions');
+var checkAuth = require('./middleware/contributor-check-auth');
 var Contributors = require('../models/contributors');
 
 router.post("/login", (req, res, next) => {
@@ -46,10 +48,19 @@ router.post("/login", (req, res, next) => {
 router.get('/courseDetail', function (req, res) {
     id = req.query.id;
     Courses.findOne({ subId: id })
-        .then((subjectDetail)=>{
+        .then((subjectDetail) => {
             res.status(200).json(subjectDetail);
         });
 });
+
+router.post('/addQuestions', function (req, res) {
+    Questions.insertMany(req.body)
+    .then((e)=>{
+        res.status(201).json({
+            msg: 'successfull'
+        })
+    })
+})
 // router.post('/', function (req, res) {
 //     const name = req.body.name;
 //     const id = req.body.email;
