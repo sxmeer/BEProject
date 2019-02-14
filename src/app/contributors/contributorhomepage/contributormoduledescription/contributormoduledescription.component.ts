@@ -21,6 +21,6 @@ export class ContributormoduledescriptionComponent implements OnInit {
   }
 
   // ngOnDestroy() {
-  //   this.data.subjectData.unsubscribe();
+  //   // this.data.subjectData.unsubscribe();
   // }
 }

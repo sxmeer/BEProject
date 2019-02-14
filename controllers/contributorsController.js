@@ -46,7 +46,7 @@ router.post("/login", (req, res, next) => {
 });
 
 router.get('/courseDetail', function (req, res) {
-    id = req.query.id;
+    const id = req.query.id;
     Courses.findOne({ subId: id })
         .then((subjectDetail) => {
             res.status(200).json(subjectDetail);

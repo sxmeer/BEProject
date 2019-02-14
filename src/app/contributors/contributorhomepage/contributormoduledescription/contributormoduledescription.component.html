@@ -1,7 +1,13 @@
-<div class="alert alert-info">{{ subjectDetail?.dept }} - {{ subjectDetail?.subName }}</div>
-<div class="card" *ngFor="let module of subjectDetail?.moduleDetails; let i = index">
-  <div class="card-body">
-    <h5 class="card-title">Module {{i+1}}.{{module.split(":")[0]}}</h5>
-    <p class="card-text">{{module}}</p>
+<div id="descContainer">
+  <div class="alert alert-info">
+    {{ subjectDetail?.dept }} - {{ subjectDetail?.subName }}
+  </div>
+  <div
+    class="card"
+    *ngFor="let module of subjectDetail?.moduleDetails; let i = index">
+    <div class="card-body">
+      <h5 class="card-title">Module {{ i + 1 }}.{{ module.split(":")[0] }}</h5>
+      <p class="card-text">{{ module }}</p>
+    </div>
   </div>
 </div>

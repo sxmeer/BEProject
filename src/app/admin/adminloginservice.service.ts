@@ -15,7 +15,7 @@ export class AdminloginserviceService {
   getToken() {
     return this.token;
   }
-  getAuthentication(){
+  getAuthentication() {
     return this.authenticated;
   }
   getAuthStatus() {
