@@ -11,6 +11,7 @@ var checkAuth = require('./middleware/admin-check-auth');
 router.post("/login", (req, res, next) => {
     let fetchedUser;
     Admin.findOne({ id: req.body.id })
+    //id: req.body.id
         .then(admin => {
             if (!admin) {
                 return res.status(401).json({

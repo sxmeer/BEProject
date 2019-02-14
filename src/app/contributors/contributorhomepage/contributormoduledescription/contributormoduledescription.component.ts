@@ -9,7 +9,7 @@ import { ContributordataService } from '../../contributordata.service';
   templateUrl: './contributormoduledescription.component.html',
   styleUrls: ['./contributormoduledescription.component.css']
 })
-export class ContributormoduledescriptionComponent implements OnInit, OnDestroy {
+export class ContributormoduledescriptionComponent implements OnInit {
   constructor(private http: HttpClient, private data: ContributordataService) { }
   subjectDetail;
   ngOnInit() {
@@ -20,7 +20,7 @@ export class ContributormoduledescriptionComponent implements OnInit, OnDestroy 
     this.data.getData();
   }
 
-  ngOnDestroy() {
-    this.data.subjectData.unsubscribe();
-  }
+  // ngOnDestroy() {
+  //   // this.data.subjectData.unsubscribe();
+  // }
 }
