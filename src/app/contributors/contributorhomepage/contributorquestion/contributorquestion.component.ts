@@ -32,9 +32,9 @@ export class ContributorquestionComponent implements OnInit {
     });
     this.data.getData();
   }
-  ngOnDestroy() {
-    this.data.subjectData.unsubscribe();
-  }
+  // ngOnDestroy() {
+  //   this.data.subjectData.unsubscribe();
+  // }
   lock() {
     if (this.question == "" || this.module == undefined || this.mark == undefined
       || this.cognitive == undefined || this.difficulty == undefined) {
