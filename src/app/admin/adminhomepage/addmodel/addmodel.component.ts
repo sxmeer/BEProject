@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { AdminloginserviceService } from '../../adminloginservice.service';
 
 @Component({
   selector: 'app-addmodel',
@@ -8,14 +10,14 @@ import { Component, OnInit } from '@angular/core';
 export class AddmodelComponent implements OnInit {
 
   title = "model";
-  question: Number = 0;
-  questionList = [];
-  questionNumber: Number;
-  marks: Number;
-  list = [];
-  total: Number = 0;
+  question: Number = 0; // for iterating the number of questions
+  list = []; //for iterating in the angular code
+  questionList = []; //the list for question model
+  questionNumber: Number; //assigning question number in the model
+  marks: Number; //assigning marks in the model
+  total: Number = 0; //for total marks of the model
 
-  constructor() {}
+  constructor(private loginService: AdminloginserviceService) {}
   ngOnInit() {}
 
   changeList() {
@@ -43,5 +45,13 @@ export class AddmodelComponent implements OnInit {
     }
     this.total = sum;
   }
-
+  submitModel(){
+    console.log("angular hit")
+    this.loginService.getContributors();
+    this.loginService.postModel({
+      numberOfQuestions: this.question ,
+      questionModelList: this.questionList,
+      totalMarks: this.total
+    });
+  }
 }

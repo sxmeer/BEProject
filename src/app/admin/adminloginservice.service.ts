@@ -30,7 +30,15 @@ export class AdminloginserviceService {
   postCourses(courseDetails) {
     return this.http.post('http://localhost:3000/admin/homepage/addcourses', courseDetails);
   }
-
+  postModel(ModelDetail){
+    console.log("service hit");
+    this.http.post('http://localhost:3000/admin/homepage/addmodel', ModelDetail);
+  }
+  getContributors(){
+    this.http.get('http://localhost:3000/admin/homepage/getContributors').subscribe((data)=>{
+        console.log(data);
+    })
+  }
   loginUser(user) {
     console.log(user);
     this.http.post<{ token: string }>('http://localhost:3000/admin/login', user)
