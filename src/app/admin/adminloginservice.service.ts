@@ -32,7 +32,10 @@ export class AdminloginserviceService {
   }
   postModel(ModelDetail){
     console.log("service hit");
-    this.http.post('http://localhost:3000/admin/homepage/addmodel', ModelDetail);
+     this.http.post<{message: String}>('http://localhost:3000/admin/homepage/addmodel', ModelDetail).subscribe(data => {
+       console.log(data);
+       alert(data.message);
+     });
   }
   getContributors(){
     this.http.get('http://localhost:3000/admin/homepage/getContributors').subscribe((data)=>{

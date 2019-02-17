@@ -141,8 +141,21 @@ router.get('/homepage/getContributors', checkAuth, (req, res, next) => {
         })
 })
 
-router.post('/homepage/addmodel', checkAuth,(req,res,next)=>{
-    console.log("hit")
+router.post('/homepage/addmodel', checkAuth, (req,res,next)=>{
+    console.log("hit");
+    
+    const model = new Models({
+        numberOfQuestions: req.body.numberOfQuestions,
+        questionModelList: req.body.questionModelList,
+        totalMarks: req.body.totalMarks
+    });
+    model.save((err, doc) => {
+        if(err) {
+            res.status(404).json({message: "Not Saved"});
+        } else if(doc) {
+            res.status(201).json({message: "Saved"});
+        }
+    });
 })
 
 router.post('/homepage/addcourses', checkAuth, (req, res, next) => {
