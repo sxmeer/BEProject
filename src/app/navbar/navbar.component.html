@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light navbar-default navbar-fixed-top">
   <a class="navbar-brand" routerLink="/" disabled>QPG</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
     aria-expanded="false" aria-label="Toggle navigation">
@@ -20,10 +20,10 @@
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
           <!-- after admin login redirect to admin page -->
           <a class="dropdown-item" routerLink="/admin/login">Admin</a>
-          <!-- Enable only when the admin allows to validate using ngIf -->
-          <a class="dropdown-item" routerLink="/validators/login">Validator</a>
           <!-- Enable when admin allows using ngIf -->
           <a class="dropdown-item" routerLink="/contributors/login">Contributor</a>
+          <!-- Enable only when the admin allows to validate using ngIf -->
+          <a class="dropdown-item" routerLink="/validators/login">Validator</a>
         </div>
       </li>
     </ul>
