@@ -6,12 +6,13 @@ const Admin = require('../models/admin');
 var Validators = require('../models/validators');
 var Contributors = require('../models/contributors');
 var Courses = require('../models/courses');
+var Models = require('../models/models');
 var checkAuth = require('./middleware/admin-check-auth');
 
 router.post("/login", (req, res, next) => {
     let fetchedUser;
     Admin.findOne({ id: req.body.id })
-    //id: req.body.id
+        //id: req.body.id
         .then(admin => {
             if (!admin) {
                 return res.status(401).json({
@@ -45,7 +46,7 @@ router.post("/login", (req, res, next) => {
 });
 
 
-router.post("/homepage/addvalidators", checkAuth,(req, res, next) => {
+router.post("/homepage/addvalidators", checkAuth, (req, res, next) => {
     const name = req.body.name;
     const id = req.body.id;
     const subjectsAssigned = req.body.subjectsAssigned;
@@ -88,7 +89,7 @@ router.post("/homepage/addvalidators", checkAuth,(req, res, next) => {
     }
 });
 
-router.post('/homepage/addcontributors',checkAuth, function (req, res) {
+router.post('/homepage/addcontributors', checkAuth, function (req, res) {
     const name = req.body.name;
     const id = req.body.id;
     const subjectsAssigned = req.body.subjectsAssigned;
@@ -132,7 +133,32 @@ router.post('/homepage/addcontributors',checkAuth, function (req, res) {
     }
 });
 
-router.post('/homepage/addcourses', checkAuth,(req, res, next) => {
+router.get('/homepage/getContributors', checkAuth, (req, res, next) => {
+    console.log("hit end point")
+    Contributors.find()
+        .then((contributors) => {
+            res.status(201).json(contributors);
+        })
+})
+
+router.post('/homepage/addmodel', checkAuth, (req,res,next)=>{
+    console.log("hit");
+    
+    const model = new Models({
+        numberOfQuestions: req.body.numberOfQuestions,
+        questionModelList: req.body.questionModelList,
+        totalMarks: req.body.totalMarks
+    });
+    model.save((err, doc) => {
+        if(err) {
+            res.status(404).json({message: "Not Saved"});
+        } else if(doc) {
+            res.status(201).json({message: "Saved"});
+        }
+    });
+})
+
+router.post('/homepage/addcourses', checkAuth, (req, res, next) => {
     var courses = new Courses({
         subName: req.body.subName,
         subId: req.body.subId,
