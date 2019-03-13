@@ -1,13 +1,26 @@
 const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator');
+// const uniqueValidator = require('mongoose-unique-validator');
 const Contributors = mongoose.Schema({
+    id: {
+      type: Number,
+      required: true
+    },
     name: {
         type: String,
         required:true,
     },
-    id: {
-        type: Number,
-        unique : true
+    email: {
+        type: String,
+        unique : true,
+        required: true
+    },
+    department: {
+      type: Number,
+      required: true
+    },
+    semester: {
+      type: Number,
+      required: true
     },
     subjectsAssigned: {
         type: String,
@@ -19,5 +32,5 @@ const Contributors = mongoose.Schema({
     }
 });
 
-Contributors.plugin(uniqueValidator);
+// Contributors.plugin(uniqueValidator);
 module.exports = mongoose.model("Contributors", Contributors);

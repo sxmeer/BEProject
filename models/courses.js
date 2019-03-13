@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const Courses = mongoose.Schema({
-    subName: {
-        type: String
-    },
+    // subName: {
+    //     type: String
+    // },
     subId: {
         type: Number
     },
@@ -11,7 +11,7 @@ const Courses = mongoose.Schema({
         type: Number
     },
     dept: {
-        type: String
+        type: Number
     },
     marksType: {
         type: Array

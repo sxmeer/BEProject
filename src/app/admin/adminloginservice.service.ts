@@ -3,6 +3,10 @@ import { Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
+import { Department } from './department.model';
+import { Subjects } from './subjects.model';
+import { Semester } from './semesters.model';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -10,6 +14,9 @@ export class AdminloginserviceService {
   authenticated = false;
   private token: string;
   authStatus = new Subject<Boolean>();
+  public departments = new Subject<Department[]>();
+  public semesters = new Subject<Semester[]>();
+  public subjects = new Subject<Subjects[]>();
   constructor(private http: HttpClient, private router: Router) { }
 
   getToken() {
@@ -64,5 +71,26 @@ export class AdminloginserviceService {
     this.authenticated = false;
     this.authStatus.next(false);
     this.router.navigate(['/']);
+  }
+
+  // Call to fetch list of departments
+  fetchDepartments() {
+    this.http.get<Department[]>('http://localhost:3000/courses/departments').subscribe(data => {
+      this.departments.next(data);
+    });
+  }
+
+  fetchSemesters(deptID) {
+    const queryParams = `?deptID=${deptID}`;
+    this.http.get<Semester[]>('http://localhost:3000/courses/semesters' + queryParams).subscribe(data => {
+      this.semesters.next(data);
+    });
+  }
+
+  fetchSubjects(deptID, semNo) {
+    const queryParams = `?deptID=${deptID}&semNo=${semNo}`;
+    this.http.get<Subjects[]>('http://localhost:3000/courses/subjects' + queryParams).subscribe(data => {
+      this.subjects.next(data);
+    });
   }
 }

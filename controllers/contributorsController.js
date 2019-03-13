@@ -3,6 +3,8 @@ var router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 var Courses = require('../models/courses');
+var Subjects = require('../models/subjects');
+var Department = require('../models/departments');
 
 var Questions = require('../models/questions');
 var checkAuth = require('./middleware/contributor-check-auth');
@@ -46,11 +48,28 @@ router.post("/login", (req, res, next) => {
 });
 
 router.get('/courseDetail', function (req, res) {
-    const id = req.query.id;
-    Courses.findOne({ subId: id })
-        .then((subjectDetail) => {
-            res.status(200).json(subjectDetail);
+  const id = req.query.id;
+  Subjects.find({subID: id})
+    .then((data) => {
+      const subName = data[0].name;
+      const deptId = data[0].deptID;
+      Department.find({deptID: deptId})
+        .then(deptData => {
+          const deptName = deptData[0].name;
+          Courses.findOne({ subId: id })
+            .then((subjectDetail) => {
+              res.status(200).json({
+                subName: subName,
+                subId: id,
+                sem: subjectDetail.sem,
+                dept: deptName,
+                marksType: subjectDetail.marksType,
+                numberOfModules: subjectDetail.numberOfModules,
+                moduleDetails: subjectDetail.moduleDetails
+            });
+          });
         });
+    });
 });
 
 router.post('/addQuestions', function (req, res) {
