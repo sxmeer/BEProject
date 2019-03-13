@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { Department } from './department.model';
 import { Subjects } from './subjects.model';
 import { Semester } from './semesters.model';
+import { Models } from './models.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,10 +14,12 @@ import { Semester } from './semesters.model';
 export class AdminloginserviceService {
   authenticated = false;
   private token: string;
+  // public models: Models[];
   authStatus = new Subject<Boolean>();
   public departments = new Subject<Department[]>();
   public semesters = new Subject<Semester[]>();
   public subjects = new Subject<Subjects[]>();
+  public models = new Subject<Models[]>();
   constructor(private http: HttpClient, private router: Router) { }
 
   getToken() {
@@ -91,6 +94,12 @@ export class AdminloginserviceService {
     const queryParams = `?deptID=${deptID}&semNo=${semNo}`;
     this.http.get<Subjects[]>('http://localhost:3000/courses/subjects' + queryParams).subscribe(data => {
       this.subjects.next(data);
+    });
+  }
+
+  getModels() {
+    this.http.get<Models[]>('http://localhost:3000/admin/homepage/getModels').subscribe(data => {
+      this.models.next(data);
     });
   }
 }

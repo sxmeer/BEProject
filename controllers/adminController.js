@@ -257,4 +257,11 @@ router.post("/homepage/addcourses", checkAuth, (req, res, next) => {
   });
 });
 
+router.get("/homepage/getModels", (req, res)=> {
+  Models.find()
+  .then((data) => {
+    res.status(200).json(data);
+  })
+})
+
 module.exports = router;

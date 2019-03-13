@@ -34,7 +34,7 @@ export class AddcourseComponent implements OnInit {
     });
     this.adminloginservice.subjects.subscribe((data: Subjects[]) => {
       this.subjects = data;
-    })
+    });
   }
   onDepartmentSelected() {
     this.adminloginservice.fetchSemesters(this.course.dept);

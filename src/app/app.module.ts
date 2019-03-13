@@ -26,6 +26,7 @@ import { ContributorquestionComponent } from './contributors/contributorhomepage
 import { ContributorAuthGuardService } from './contributors/contributor-auth-gaurd.service';
 import { ValidatorAuthGuardService } from './validators/validator-auth-gaurd.service';
 import { AddmodelComponent } from './admin/adminhomepage/addmodel/addmodel.component';
+import { GeneratepaperComponent } from './admin/adminhomepage/generatepaper/generatepaper.component';
 
 const routes: Routes = [
   { path: 'admin/login', component: AdminloginComponent },
@@ -33,7 +34,8 @@ const routes: Routes = [
     { path: 'addvalidators', component: AddvalidatorComponent },
     { path: 'addcourses', component: AddcourseComponent },
     { path: 'addcontributors', component: AddcontributorComponent },
-    { path: 'addmodel', component: AddmodelComponent }
+    { path: 'addmodel', component: AddmodelComponent },
+    { path: 'generatePaper', component: GeneratepaperComponent }
   ], canActivate:[AdminAuthGuardService] },
   { path: 'validators/login', component: ValidatorloginComponent },
   { path: 'validators/homepage', component: ValidatorhomepageComponent, canActivate:[ValidatorAuthGuardService]},
@@ -56,7 +58,8 @@ const routes: Routes = [
     AddcourseComponent,
     ContributormoduledescriptionComponent,
     ContributorquestionComponent,
-    AddmodelComponent
+    AddmodelComponent,
+    GeneratepaperComponent
   ],
   imports: [
     BrowserModule,
