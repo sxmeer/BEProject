@@ -36,7 +36,7 @@ export class AddcontributorComponent implements OnInit {
     });
     this.adminloginservice.subjects.subscribe((data: Subjects[]) => {
       this.subjects = data;
-    })
+    });
   }
   onSubmit() {
     this.adminloginservice.postContributor(this.selectedContributor).subscribe((res) => {

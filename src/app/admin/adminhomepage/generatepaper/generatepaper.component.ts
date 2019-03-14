@@ -56,7 +56,7 @@ export class GeneratepaperComponent implements OnInit {
     this.modelDesc = this.models.filter((item) => {
       return item._id === this.paperSpecification.modelID;
     });
-    this.questionDesc = JSON.stringify(this.modelDesc[0].questionModelList);
+    this.questionDesc = JSON.stringify(this.modelDesc[0].questionModelList, undefined, 2);
   }
 
   onSubmit() {

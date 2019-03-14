@@ -1,22 +1,35 @@
-const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator');
+const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 const Validators = mongoose.Schema({
-    name: {
-        type: String,
-        required:true,
-    },
-    id: {
-        type: Number,
-        unique : true
-    },
-    subjectsAssigned: {
-        type: String,
-        required:true,
-    },
-    password: {
-        type: String,
-        required:true,
-    }
+  id: {
+    type: Number,
+    required: true
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    unique: true,
+    required: true
+  },
+  department: {
+    type: Number,
+    required: true
+  },
+  semester: {
+    type: Number,
+    required: true
+  },
+  subjectsAssigned: {
+    type: String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  }
 });
 
 Validators.plugin(uniqueValidator);
