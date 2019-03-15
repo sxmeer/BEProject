@@ -11,7 +11,6 @@ const Validators = mongoose.Schema({
   },
   email: {
     type: String,
-    unique: true,
     required: true
   },
   department: {
@@ -32,5 +31,5 @@ const Validators = mongoose.Schema({
   }
 });
 
-Validators.plugin(uniqueValidator);
+// Validators.plugin(uniqueValidator);
 module.exports = mongoose.model("Validators", Validators);

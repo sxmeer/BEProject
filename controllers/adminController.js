@@ -265,46 +265,46 @@ router.post("/homepage/addcontributors", checkAuth, function(req, res) {
                 res.json({ err: "error" });
                 return;
               } else {
+                Departments.find({ deptID: contributor.department }).then(data => {
+                  const deptName = data[0].name;
+                  Subjects.find({ subID: contributor.subjectsAssigned }).then(
+                    subData => {
+                      const subName = subData[0].name;
+                      const html = `
+                      <h1 style="color: blue; text-align: center;">Question Paper Generator</h1>
+                      <br><br>
+                      <h3>Hello ${ contributor.name },</h3>
+                      <h3>Congratulations!, you have been appointed as contributor for subject ${ subName } - ${ deptName }.</h3>
+                      <h3>You can login to qpg.com using the credentials given below.</h3>
+                      <br><br>
+                      <h4 style="color: red">User ID: <span style="color: purple">${ contributor.id }</span></h4>
+                      <br>
+                      <h4 style="color: red">Password: <span style="color: purple">${ genPass }</span></h4>
+                      <br>`;
+                      const mailOptions = {
+                        from: "wtlminiproject84@gmail.com",
+                        to: contributor.email,
+                        subject: "QPG: Contributor Login Credentials",
+                        html: html
+                      };
+                      transporter.sendMail(mailOptions, function(error, info) {
+                        if (error) {
+                          console.log(error);
+                          // res.status(404).json({ msg: "Failed to send mail" });
+                        } else {
+                          console.log("Email sent: " + info.response);
+                          // res.status(200).json({ msg: info.response });
+                        }
+                      });
+                    }
+                  );
+                });
                 res.json({ msg: "registered" });
               }
             });
           });
           // console.log(contributor);
           //Sending Mail
-          Departments.find({ deptID: contributor.department }).then(data => {
-            const deptName = data[0].name;
-            Subjects.find({ subID: contributor.subjectsAssigned }).then(
-              subData => {
-                const subName = subData[0].name;
-                const html = `
-                <h1 style="color: blue; text-align: center;">Question Paper Generator</h1>
-                <br><br>
-                <h3>Hello ${ contributor.name },</h3>
-                <h3>Congratulations!, you have been appointed as contributor for subject ${ subName } - ${ deptName }.</h3>
-                <h3>You can login to qpg.com using the credentials given below.</h3>
-                <br><br>
-                <h4 style="color: red">User ID: <span style="color: purple">${ contributor.id }</span></h4>
-                <br>
-                <h4 style="color: red">Password: <span style="color: purple">${ genPass }</span></h4>
-                <br>`;
-                const mailOptions = {
-                  from: "wtlminiproject84@gmail.com",
-                  to: contributor.email,
-                  subject: "QPG: Contributor Login Credentials",
-                  html: html
-                };
-                transporter.sendMail(mailOptions, function(error, info) {
-                  if (error) {
-                    console.log(error);
-                    // res.status(404).json({ msg: "Failed to send mail" });
-                  } else {
-                    console.log("Email sent: " + info.response);
-                    // res.status(200).json({ msg: info.response });
-                  }
-                });
-              }
-            );
-          });
         });
       });
   }
@@ -362,5 +362,13 @@ router.get("/homepage/getModels", (req, res)=> {
     res.status(200).json(data);
   })
 })
+
+router.get('/homepage/getSubjectData', (req, res) => {
+  const subId = req.query.subid;
+  Courses.findOne({subId})
+  .then((data) => {
+    res.status(200).json(data);
+  })
+});
 
 module.exports = router;

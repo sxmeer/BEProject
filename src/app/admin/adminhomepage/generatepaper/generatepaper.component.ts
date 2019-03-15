@@ -12,6 +12,7 @@ import { Subjects } from '../../subjects.model';
 })
 export class GeneratepaperComponent implements OnInit {
 
+  marksList = [];
   models: Models[];
   modelDesc: Models[];
   questionDesc;
@@ -19,7 +20,11 @@ export class GeneratepaperComponent implements OnInit {
     modelID: '',
     deptID: 0,
     semNo: 0,
-    subID: 0
+    subID: 0,
+    numberOfModules: 0,
+    unitwiseDistribution: [],
+    difficulty: [],
+    cognitive: []
   };
 
   public depts: Department[];
@@ -43,6 +48,15 @@ export class GeneratepaperComponent implements OnInit {
     this.adminLoginService.subjects.subscribe((data: Subjects[]) => {
       this.subjects = data;
     });
+    this.adminLoginService.subjectData
+    .subscribe((data: {dept: number, marksType: Array<number>, moduleDetails: Array<string>, numberOfModules: number, sem: number, subId: number}) => {
+      this.paperSpecification.numberOfModules = data.numberOfModules;
+      // console.log(this.numberOfModules);
+      this.marksList = new Array(this.paperSpecification.numberOfModules);
+      this.addUnitwiseDistribution();
+    });
+    this.paperSpecification.difficulty = new Array(3);
+    this.paperSpecification.cognitive = new Array(3);
   }
 
   onDepartmentSelected() {
@@ -59,8 +73,20 @@ export class GeneratepaperComponent implements OnInit {
     this.questionDesc = JSON.stringify(this.modelDesc[0].questionModelList, undefined, 2);
   }
 
-  onSubmit() {
+  onSubjectSelected() {
+    this.adminLoginService.getSubjectData(this.paperSpecification.subID);
+  }
 
+  addUnitwiseDistribution() {
+    this.paperSpecification.unitwiseDistribution = new Array(this.paperSpecification.numberOfModules);
+    for(let i = 1; i <= this.paperSpecification.numberOfModules; i++) {
+      this.marksList[i - 1] = i;
+    }
+    console.log(this.marksList);
+  }
+
+  onSubmit() {
+    console.log(this.paperSpecification);
   }
 
 }

@@ -20,6 +20,7 @@ export class AdminloginserviceService {
   public semesters = new Subject<Semester[]>();
   public subjects = new Subject<Subjects[]>();
   public models = new Subject<Models[]>();
+  public subjectData = new Subject();
   constructor(private http: HttpClient, private router: Router) { }
 
   getToken() {
@@ -100,6 +101,12 @@ export class AdminloginserviceService {
   getModels() {
     this.http.get<Models[]>('http://localhost:3000/admin/homepage/getModels').subscribe(data => {
       this.models.next(data);
+    });
+  }
+
+  getSubjectData(subID) {
+    this.http.get('http://localhost:3000/admin/homepage/getSubjectData?subid='+subID).subscribe(data => {
+      this.subjectData.next(data);
     });
   }
 }

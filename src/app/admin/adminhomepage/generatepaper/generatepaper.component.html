@@ -29,25 +29,61 @@
 
             <div class="form-group">
               <label for="subjectname">Subject Name</label>
-              <select name="subjectname" id="subjectname" [(ngModel)]="paperSpecification.subID" class="form-control" required>
+              <select name="subjectname" id="subjectname" [(ngModel)]="paperSpecification.subID" class="form-control" (change)="onSubjectSelected()" required>
               <option *ngFor="let sub of subjects" [value]="sub.subID">{{ sub.name }}</option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="unitwiseMarksDistribution">Unitwise Marks Distribution</label>
-            <!-- Logic for implementing unitwise marks disribution -->
+            <div class="row">
+              <div class="col-sm-3" *ngFor="let number of marksList">
+                <label for="unitmark">Unit {{ number }}</label>
+                <input type="number" class="form-control" [(ngModel)]="paperSpecification.unitwiseDistribution[number-1]" name="unit" id="unit">
+              </div>
+            </div>
           </div>
 
           <div class="form-group">
             <label for="difficulty">Difficulty</label>
-            <!-- Logic for implementing difficulty section -->
+            <div class="form-group">
+              <div class="row">
+                <div class="col-sm-4">
+                  <label for="easy">Easy</label>
+                  <input type="number" name="easy" [(ngModel)]="paperSpecification.difficulty[0]" id="easy" class="form-control">
+                </div>
+                <div class="col-sm-4">
+                  <label for="moderate">Moderate</label>
+                  <input type="number" name="moderate" id="moderate" [(ngModel)]="paperSpecification.difficulty[1]" class="form-control">
+                </div>
+                <div class="col-sm-4">
+                  <label for="difficult">Difficult</label>
+                  <input type="number" name="difficult" id="difficult" [(ngModel)]="paperSpecification.difficulty[2]" class="form-control">
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="form-group">
             <label for="cognitiveLevel">Cognitive Level</label>
-            <!-- Logic for implementing cognitive level section -->
+            <div class="form-group">
+              <div class="row">
+                <div class="col-sm-4">
+                  <label for="easy">Knowledge</label>
+                  <input type="number" name="knowledge" [(ngModel)]="paperSpecification.cognitive[0]" id="knowledge" class="form-control">
+                </div>
+                <div class="col-sm-4">
+                  <label for="moderate">Application</label>
+                  <input type="number" name="application" id="application" [(ngModel)]="paperSpecification.cognitive[1]" class="form-control">
+                </div>
+                <div class="col-sm-4">
+                  <label for="difficult">Comprehension</label>
+                  <input type="number" name="comprehension" id="comprehension" [(ngModel)]="paperSpecification.cognitive[2]" class="form-control">
+                </div>
+              </div>
+            </div>
           </div>
+          <input type="submit" value="Generate">
         </form>
       </div>
     </div>
