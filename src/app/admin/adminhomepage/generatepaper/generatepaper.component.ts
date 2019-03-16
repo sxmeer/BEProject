@@ -4,6 +4,7 @@ import { Models } from "../../models.model";
 import { Department } from "../../department.model";
 import { Semester } from "../../semesters.model";
 import { Subjects } from "../../subjects.model";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: "app-generatepaper",
@@ -30,7 +31,7 @@ export class GeneratepaperComponent implements OnInit {
   public semesters: Semester[];
   public subjects: Subjects[];
 
-  constructor(private adminLoginService: AdminloginserviceService) {}
+  constructor(private adminLoginService: AdminloginserviceService, private http: HttpClient) { }
 
   ngOnInit() {
     this.adminLoginService.getModels();
@@ -111,7 +112,7 @@ export class GeneratepaperComponent implements OnInit {
       document.getElementById("marksError").innerText =
         "Sum of marks of Unitwise distribution must be equal to " +
         this.modelDesc.totalMarks;
-        this.clearFunction();
+      this.clearFunction();
       return;
     }
     sumOfMarks = 0;
@@ -122,7 +123,7 @@ export class GeneratepaperComponent implements OnInit {
       document.getElementById("diffError").innerText =
         "Sum of marks of difficulty level must be equal to " +
         this.modelDesc.totalMarks;
-        this.clearFunction();
+      this.clearFunction();
       return;
     }
     sumOfMarks = 0;
@@ -133,12 +134,14 @@ export class GeneratepaperComponent implements OnInit {
       document.getElementById("cogError").innerText =
         "Sum of marks of congitive level must be equal to " +
         this.modelDesc.totalMarks;
-        this.clearFunction();
+      this.clearFunction();
       return;
     }
     console.log(this.paperSpecification);
+    this.http.post('http://localhost:3000/admin/homepage/generatePaper', this.paperSpecification).subscribe(() => {
+    });
   }
-  clearFunction(){
+  clearFunction() {
     setTimeout(() => {
       document.getElementById("marksError").innerText = "";
       document.getElementById("diffError").innerText = "";

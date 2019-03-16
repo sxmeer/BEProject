@@ -1,3 +1,60 @@
-<p>
-  validatorhomepage works!
-</p>
+<div class="row">
+  <div class="col mt-2">
+    <div class="container">
+      <app-validatormoduledescription></app-validatormoduledescription>
+    </div>
+  </div>
+  <div class="col mt-2">
+    <button (click)="addQuestion()" class="btn btn-info mb-2">Add Question Component</button>
+    <div class="card mb-3" *ngFor="let questions of dataService.Questions">
+      <div class="card-body">
+          <!-- <strong>Module : </strong> {{questions.module}} <br>
+          <strong>Question : </strong> {{questions.question}} <br>
+          <strong>Marks : </strong> {{questions.marks}} <br>
+          <strong>Cognitive Level : </strong> <br>
+          <strong>Difficulty Level: </strong> <br> -->
+          <table border="2px">
+            <tr>
+              <td><strong>Module : </strong></td>
+              <td>{{ questions.module }}</td>
+            </tr>
+            <tr>
+                <td><strong>Question : </strong></td>
+                <td>{{ questions.question }}</td>
+            </tr>
+            <tr>
+                <td><strong>Marks : </strong></td>
+                <td>{{ questions.marks }}</td>
+            </tr>
+            <tr>
+                <td><strong>Cognitive Level : </strong></td>
+                <td>{{ cog[questions.cognitive - 1] }}</td>
+            </tr>
+            <tr>
+                <td><strong>Difficulty Level : </strong></td>
+                <td>{{ diff[questions.difficulty - 1] }}</td>
+            </tr>
+          </table>
+      </div>
+      <br>
+        <div class="row">
+          <div class="col-sm-4">
+              <button class="btn btn-block btn-success" (click)="dataService.markAsValidQuestion(questions)">Accept Question</button>
+          </div>
+          <div class="col-sm-4">
+              <button class="btn btn-block btn-secondary" (click)="dataService.skip(questions)">Skip</button>
+          </div>
+          <div class="col-sm-4">
+              <button class="btn btn-block btn-danger" (click)="dataService.markAsInvalidQuestion(questions)">Reject Question</button>
+          </div>
+        </div>
+    </div>
+    <!-- <div id="quesContainer">
+      <div id="question-container">
+        <app-contributorquestion *ngFor="let question of questionList" [id]="question" (removeEmitter)="remover($event)">
+        </app-contributorquestion>
+      </div>
+    </div>
+    <button (click)="submitQuestions()" class="mt-2 btn btn-outline-warning">Submit</button> -->
+  </div>
+</div>

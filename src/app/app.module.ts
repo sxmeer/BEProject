@@ -27,6 +27,7 @@ import { ContributorAuthGuardService } from './contributors/contributor-auth-gau
 import { ValidatorAuthGuardService } from './validators/validator-auth-gaurd.service';
 import { AddmodelComponent } from './admin/adminhomepage/addmodel/addmodel.component';
 import { GeneratepaperComponent } from './admin/adminhomepage/generatepaper/generatepaper.component';
+import { ValidatormoduledescriptionComponent } from './validators/validatorhomepage/validatormoduledescription/validatormoduledescription.component';
 
 const routes: Routes = [
   { path: 'admin/login', component: AdminloginComponent },
@@ -59,7 +60,8 @@ const routes: Routes = [
     ContributormoduledescriptionComponent,
     ContributorquestionComponent,
     AddmodelComponent,
-    GeneratepaperComponent
+    GeneratepaperComponent,
+    ValidatormoduledescriptionComponent
   ],
   imports: [
     BrowserModule,

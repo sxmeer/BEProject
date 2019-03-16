@@ -12,6 +12,7 @@ var Contributors = require("../models/contributors");
 var Courses = require("../models/courses");
 var Models = require("../models/models");
 var checkAuth = require("./middleware/admin-check-auth");
+var Model = require('../models/models');
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -315,6 +316,23 @@ router.get("/homepage/getContributors", checkAuth, (req, res, next) => {
   Contributors.find().then(contributors => {
     res.status(201).json(contributors);
   });
+});
+
+router.post("/homepage/generatePaper", (req, res, next) => {
+  console.log(req.body);
+  Courses.find({
+    subId: req.body.subID
+  })
+  .then((course)=>{
+    Model.find({
+      _id:req.body.modelID
+    })
+    .then((model)=>{
+      console.log(course);
+      console.log(model);
+    })
+  })
+
 });
 
 router.post("/homepage/addmodel", checkAuth, (req, res, next) => {
