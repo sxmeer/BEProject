@@ -3,24 +3,24 @@
     <div class="card">
       <div class="card-body">
         <h6 class="card-title text-center">Specify Paper Description</h6>
+        <hr>
         <form (submit)="onSubmit()">
           <div class="form-group">
-            <label for="model">Paper Pattern</label>
+            <label for="model"><strong>Paper Pattern</strong></label>
             <select name="model" id="model" [(ngModel)]="paperSpecification.modelID" class="form-control" (change)="onModelSelected()" required>
               <option *ngFor="let model of models" [value]="model._id">{{ model.numberOfQuestions }} Questions {{ model.totalMarks }} Marks</option>
             </select>
           </div>
           <div class="form-group">
-              <label for="department">Department</label>
+              <label for="department"><strong>Department</strong></label>
               <!-- <input type="text" name="department" id="department" [(ngModel)]="course.dept" class="form-control" required> -->
               <select name="department" id="department" [(ngModel)]="paperSpecification.deptID" class="form-control" (change)="onDepartmentSelected()" required>
                 <!-- (change)="onDepartmentSelected(department)" -->
                 <option *ngFor="let dept of depts" [value]="dept.deptID">{{ dept.name }}</option>
               </select>
             </div>
-
             <div class="form-group">
-                <label for="semester">Semester</label>
+                <label for="semester"><strong>Semester</strong></label>
                 <!-- <input type="text" name="semester" id="semester" [(ngModel)]="course.sem" class="form-control" required> -->
                 <select name="semester" id="semester" [(ngModel)]="paperSpecification.semNo" class="form-control" (change)="onSemesterSelected()" required>
                   <option *ngFor="let sem of semesters" [value]="sem.semNo">{{ sem.semNo }}</option>
@@ -28,29 +28,32 @@
             </div>
 
             <div class="form-group">
-              <label for="subjectname">Subject Name</label>
+              <label for="subjectname"><strong>Subject Name</strong></label>
               <select name="subjectname" id="subjectname" [(ngModel)]="paperSpecification.subID" class="form-control" (change)="onSubjectSelected()" required>
               <option *ngFor="let sub of subjects" [value]="sub.subID">{{ sub.name }}</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="unitwiseMarksDistribution">Unitwise Marks Distribution</label>
-            <div class="row">
+            <label for="unitwiseMarksDistribution"><strong>Unitwise Marks Distribution</strong></label>
+            <div class="row card-body">
               <div class="col-sm-3" *ngFor="let number of marksList">
                 <label for="unitmark">Unit {{ number }}</label>
-                <input type="number" class="form-control" [(ngModel)]="paperSpecification.unitwiseDistribution[number-1]" name="unit" id="unit">
+                <input type="number" class="form-control" [(ngModel)]="paperSpecification.unitwiseDistribution[number-1]" name="unit" id="unit" >
               </div>
             </div>
+            <div id="marksError" style="color: red;"></div>
           </div>
 
+
+
           <div class="form-group">
-            <label for="difficulty">Difficulty</label>
+            <label for="difficulty"><strong>Difficulty</strong></label>
             <div class="form-group">
-              <div class="row">
+              <div class="row card-body">
                 <div class="col-sm-4">
                   <label for="easy">Easy</label>
-                  <input type="number" name="easy" [(ngModel)]="paperSpecification.difficulty[0]" id="easy" class="form-control">
+                  <input type="number" name="easy" [(ngModel)]="paperSpecification.difficulty[0]" id="easy" class="form-control marksInput">
                 </div>
                 <div class="col-sm-4">
                   <label for="moderate">Moderate</label>
@@ -62,26 +65,28 @@
                 </div>
               </div>
             </div>
+            <div id="diffError" style="color: red;"></div>
           </div>
 
           <div class="form-group">
-            <label for="cognitiveLevel">Cognitive Level</label>
+            <label for="cognitiveLevel"><strong>Cognitive Level</strong></label>
             <div class="form-group">
-              <div class="row">
+              <div class="row card-body">
                 <div class="col-sm-4">
-                  <label for="easy">Knowledge</label>
-                  <input type="number" name="knowledge" [(ngModel)]="paperSpecification.cognitive[0]" id="knowledge" class="form-control">
+                  <label for="application">Application</label>
+                  <input type="number" name="application" [(ngModel)]="paperSpecification.cognitive[0]" id="comprehension" class="form-control">
                 </div>
                 <div class="col-sm-4">
-                  <label for="moderate">Application</label>
-                  <input type="number" name="application" id="application" [(ngModel)]="paperSpecification.cognitive[1]" class="form-control">
+                  <label for="comprehension">Comprehension</label>
+                  <input type="number" name="comprehension" id="comprehension" [(ngModel)]="paperSpecification.cognitive[1]" class="form-control">
                 </div>
                 <div class="col-sm-4">
-                  <label for="difficult">Comprehension</label>
-                  <input type="number" name="comprehension" id="comprehension" [(ngModel)]="paperSpecification.cognitive[2]" class="form-control">
+                  <label for="comprehension">Knowledge</label>
+                  <input type="number" name="knowledge" id="knowledge" [(ngModel)]="paperSpecification.cognitive[2]" class="form-control">
                 </div>
               </div>
             </div>
+            <div id="cogError" style="color: red;"></div>
           </div>
           <input type="submit" value="Generate">
         </form>
