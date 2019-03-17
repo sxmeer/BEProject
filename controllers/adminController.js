@@ -12,7 +12,8 @@ var Contributors = require("../models/contributors");
 var Courses = require("../models/courses");
 var Models = require("../models/models");
 var checkAuth = require("./middleware/admin-check-auth");
-var Model = require('../models/models');
+var Model = require("../models/models");
+var QuestionSet = require('../models/questions');
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -58,60 +59,66 @@ router.post("/login", (req, res, next) => {
     });
 });
 
+router.get('/insert', (req, res) => {
+  QuestionSet.updateMany({}, { $set: { checked: 0, asked: 0, isValid:0 } }).then((docs) => {
+    res.send(docs);
+  })
+})
+
 router.post("/homepage/addvalidators", checkAuth, (req, res, next) => {
-//   const name = req.body.name;
-//   const id = req.body.id;
-//   const subjectsAssigned = req.body.subjectsAssigned;
-//   const password = req.body.password;
-//   const password2 = req.body.password2;
-//   req.checkBody("name", "Name is required").notEmpty();
-//   req.checkBody("subjectsAssigned", "subject is required").notEmpty();
-//   req.checkBody("id", "Id is required").notEmpty();
-//   req.checkBody("password", "Password is required").notEmpty();
-//   req
-//     .checkBody("password2", "Passwords do not match")
-//     .equals(req.body.password);
+  //   const name = req.body.name;
+  //   const id = req.body.id;
+  //   const subjectsAssigned = req.body.subjectsAssigned;
+  //   const password = req.body.password;
+  //   const password2 = req.body.password2;
+  //   req.checkBody("name", "Name is required").notEmpty();
+  //   req.checkBody("subjectsAssigned", "subject is required").notEmpty();
+  //   req.checkBody("id", "Id is required").notEmpty();
+  //   req.checkBody("password", "Password is required").notEmpty();
+  //   req
+  //     .checkBody("password2", "Passwords do not match")
+  //     .equals(req.body.password);
 
-//   let errors = req.validationErrors();
-//   if (errors) {
-//     res.json({
-//       err: errors
-//     });
-//   } else {
-//     bcrypt.hash(password, 10).then(hash => {
-//       const validator = new Validators({
-//         name: name,
-//         id: id,
-//         subjectsAssigned: subjectsAssigned,
-//         password: hash
-//       });
-//       validator
-//         .save()
-//         .then(result => {
-//           res.status(201).json({
-//             message: "validator created!",
-//             result: result
-//           });
-//         })
-//         .catch(err => {
-//           res.status(500).json({
-//             error: err
-//           });
-//         });
-//     });
-//   }
-// });
+  //   let errors = req.validationErrors();
+  //   if (errors) {
+  //     res.json({
+  //       err: errors
+  //     });
+  //   } else {
+  //     bcrypt.hash(password, 10).then(hash => {
+  //       const validator = new Validators({
+  //         name: name,
+  //         id: id,
+  //         subjectsAssigned: subjectsAssigned,
+  //         password: hash
+  //       });
+  //       validator
+  //         .save()
+  //         .then(result => {
+  //           res.status(201).json({
+  //             message: "validator created!",
+  //             result: result
+  //           });
+  //         })
+  //         .catch(err => {
+  //           res.status(500).json({
+  //             error: err
+  //           });
+  //         });
+  //     });
+  //   }
+  // });
 
-// router.get("/homepage/addcontributors", (req, res) => {
-//   Contributors.find()
-//     .sort({ id: -1 })
-//     .limit(1)
-//     .then(data => {
-//       // console.log(data);
-//       res.status(200).json(data);
-//     });
+  // router.get("/homepage/addcontributors", (req, res) => {
+  //   Contributors.find()
+  //     .sort({ id: -1 })
+  //     .limit(1)
+  //     .then(data => {
+  //       // console.log(data);
+  //       res.status(200).json(data);
+  //     });
 
-const name = req.body.name;
+  const name = req.body.name;
   const email = req.body.email;
   const subId = req.body.subId;
   const dept = req.body.dept;
@@ -179,13 +186,15 @@ const name = req.body.name;
                 const html = `
                 <h1 style="color: blue; text-align: center;">Question Paper Generator</h1>
                 <br><br>
-                <h3>Hello ${ validator.name },</h3>
-                <h3>Congratulations!, you have been appointed as validator for subject ${ subName } - ${ deptName }.</h3>
+                <h3>Hello ${validator.name},</h3>
+                <h3>Congratulations!, you have been appointed as validator for subject ${subName} - ${deptName}.</h3>
                 <h3>You can login to qpg.com using the credentials given below.</h3>
                 <br><br>
-                <h4 style="color: red">User ID: <span style="color: purple">${ validator.id }</span></h4>
+                <h4 style="color: red">User ID: <span style="color: purple">${
+                  validator.id
+                }</span></h4>
                 <br>
-                <h4 style="color: red">Password: <span style="color: purple">${ genPass }</span></h4>
+                <h4 style="color: red">Password: <span style="color: purple">${genPass}</span></h4>
                 <br>`;
                 const mailOptions = {
                   from: "wtlminiproject84@gmail.com",
@@ -208,7 +217,6 @@ const name = req.body.name;
         });
       });
   }
-
 });
 
 router.post("/homepage/addcontributors", checkAuth, function(req, res) {
@@ -266,40 +274,47 @@ router.post("/homepage/addcontributors", checkAuth, function(req, res) {
                 res.json({ err: "error" });
                 return;
               } else {
-                Departments.find({ deptID: contributor.department }).then(data => {
-                  const deptName = data[0].name;
-                  Subjects.find({ subID: contributor.subjectsAssigned }).then(
-                    subData => {
-                      const subName = subData[0].name;
-                      const html = `
+                Departments.find({ deptID: contributor.department }).then(
+                  data => {
+                    const deptName = data[0].name;
+                    Subjects.find({ subID: contributor.subjectsAssigned }).then(
+                      subData => {
+                        const subName = subData[0].name;
+                        const html = `
                       <h1 style="color: blue; text-align: center;">Question Paper Generator</h1>
                       <br><br>
-                      <h3>Hello ${ contributor.name },</h3>
-                      <h3>Congratulations!, you have been appointed as contributor for subject ${ subName } - ${ deptName }.</h3>
+                      <h3>Hello ${contributor.name},</h3>
+                      <h3>Congratulations!, you have been appointed as contributor for subject ${subName} - ${deptName}.</h3>
                       <h3>You can login to qpg.com using the credentials given below.</h3>
                       <br><br>
-                      <h4 style="color: red">User ID: <span style="color: purple">${ contributor.id }</span></h4>
+                      <h4 style="color: red">User ID: <span style="color: purple">${
+                        contributor.id
+                      }</span></h4>
                       <br>
-                      <h4 style="color: red">Password: <span style="color: purple">${ genPass }</span></h4>
+                      <h4 style="color: red">Password: <span style="color: purple">${genPass}</span></h4>
                       <br>`;
-                      const mailOptions = {
-                        from: "wtlminiproject84@gmail.com",
-                        to: contributor.email,
-                        subject: "QPG: Contributor Login Credentials",
-                        html: html
-                      };
-                      transporter.sendMail(mailOptions, function(error, info) {
-                        if (error) {
-                          console.log(error);
-                          // res.status(404).json({ msg: "Failed to send mail" });
-                        } else {
-                          console.log("Email sent: " + info.response);
-                          // res.status(200).json({ msg: info.response });
-                        }
-                      });
-                    }
-                  );
-                });
+                        const mailOptions = {
+                          from: "wtlminiproject84@gmail.com",
+                          to: contributor.email,
+                          subject: "QPG: Contributor Login Credentials",
+                          html: html
+                        };
+                        transporter.sendMail(mailOptions, function(
+                          error,
+                          info
+                        ) {
+                          if (error) {
+                            console.log(error);
+                            // res.status(404).json({ msg: "Failed to send mail" });
+                          } else {
+                            console.log("Email sent: " + info.response);
+                            // res.status(200).json({ msg: info.response });
+                          }
+                        });
+                      }
+                    );
+                  }
+                );
                 res.json({ msg: "registered" });
               }
             });
@@ -322,17 +337,564 @@ router.post("/homepage/generatePaper", (req, res, next) => {
   console.log(req.body);
   Courses.find({
     subId: req.body.subID
-  })
-  .then((course)=>{
+  }).then(course => {
     Model.find({
-      _id:req.body.modelID
-    })
-    .then((model)=>{
-      console.log(course);
-      console.log(model);
-    })
-  })
+      _id: req.body.modelID
+    }).then(model => {
+      var Course = course[0];
+      var ModelOfPaper = model[0];
+      console.log(Course);
+      console.log(ModelOfPaper);
+      var QuestionId = new Array(50).fill(-4);
+      var Question = new Array(50).fill(-4);
+      var Question_temp = new Array(50).fill(-4);
+      var StatusOfQue = new Array(50).fill(-4);
+      var UnitNo = new Array(50).fill(-4);
+      var Unit = new Array(50).fill(-4);
+      var StatusOfUnit = new Array(50).fill(-4);
 
+      var Difficulty_level_no = new Array(50).fill(-4);
+      var Difficulty_level = new Array(50).fill(-4);
+      var StatusOfDiff = new Array(50).fill(-4);
+
+      var Cognitive_level_no = new Array(50).fill(-4);
+      var Cognitive_level = new Array(50).fill(-4);
+      var StatusOfCog = new Array(50).fill(-4);
+
+      var i, j, LocQ, LocU, part1, part2;
+      for (let iter = 0; iter < ModelOfPaper.questionModelList.length; iter++) {
+        QuestionId[iter] = ModelOfPaper.questionModelList[iter].questionNumber;
+        Question[iter] = ModelOfPaper.questionModelList[iter].marks;
+        Question_temp[iter] = ModelOfPaper.questionModelList[iter].marks;
+        StatusOfQue[iter] = 1;
+        UnitNo[iter] = 0;
+        Difficulty_level_no[iter] = 0;
+        Cognitive_level_no[iter] = 0;
+      }
+      for (let iter = 0; iter < Course.numberOfModules; iter++) {
+        Unit[iter] = req.body.unitwiseDistribution[iter];
+        StatusOfUnit[iter] = 1;
+      }
+      for (let iter = 0; iter < req.body.difficulty.length; iter++) {
+        Difficulty_level[iter] = req.body.difficulty[iter];
+        StatusOfDiff[iter] = 1;
+        Cognitive_level[iter] = req.body.cognitive[iter];
+        StatusOfCog[iter] = 1;
+      }
+      //functions
+
+      checkCondition = function(array) {
+        for (i = 0; array[i] != -4; i++) {
+          if (array[i] == 1) return false;
+        }
+        return true;
+      };
+
+      maxim = function(array) {
+        LocQq = -1;
+        maxi = -99;
+        for (i = 0; array[i] != -4; i++) {
+          if (array[i] > maxi) {
+            maxi = array[i];
+            LocQq = i;
+          }
+        }
+        return LocQq;
+      };
+      maxUnit = function(array, questionMax) {
+        (LocUu = -1), i;
+        diff = -1000;
+        for (i = 0; array[i] != -4; i++) {
+          if (questionMax - array[i] > 0) continue;
+          if (questionMax - array[i] > diff) {
+            diff = questionMax - array[i];
+            LocUu = i;
+          }
+        }
+        if (LocUu == -1) {
+          LocUu = maxim(array);
+        }
+        return LocUu;
+      };
+      shiftArray = function(array, pos) {
+        i, (count = 0);
+        for (i = 0; array[i] != -4; i++) count++;
+        for (i = count; i > pos; i--) {
+          array[i] = array[i - 1];
+        }
+      };
+
+      // step1
+      for (i = 0; Question[i] != -4; i++) {
+        if (StatusOfQue[i] == -1) continue;
+        for (j = 0; Unit[j] != -4; j++) {
+          if (StatusOfUnit[j] == -1) continue;
+          if (Question[i] == Unit[j]) {
+            Question[i] = 0;
+            Unit[j] = 0;
+
+            UnitNo[i] = j + 1;
+
+            StatusOfQue[i] = -1;
+            StatusOfUnit[j] = -1;
+          }
+        }
+      }
+
+      //step 2
+      for (i = 0; Question[i] != -4; i++) {
+        if (StatusOfQue[i] == -1) continue;
+        for (j = i + 1; Question[j] != -4; j++) {
+          if (StatusOfQue[j] == -1) continue;
+          for (k = 0; Unit[k] != -4; k++) {
+            if (StatusOfUnit[k] == -1) continue;
+            if (Question[i] + Question[j] == Unit[k]) {
+              StatusOfQue[i] = -1;
+              StatusOfQue[j] = -1;
+              StatusOfUnit[k] = -1;
+
+              Question[i] = 0;
+              Question[j] = 0;
+              Unit[k] = 0;
+
+              UnitNo[i] = k + 1;
+              UnitNo[j] = k + 1;
+            }
+          }
+        }
+      }
+
+      //step 3
+
+      while (!checkCondition(StatusOfQue)) {
+        LocQ = maxim(Question);
+        LocU = maxUnit(Unit, Question[LocQ]);
+        if (Question[LocQ] == Unit[LocU]) {
+          Unit[LocU] = 0;
+          Question[LocQ] = 0;
+          UnitNo[LocQ] = LocU + 1;
+          StatusOfQue[LocQ] = -1;
+          StatusOfUnit[LocU] = -1;
+        } else if (Unit[LocU] > Question[LocQ]) {
+          Unit[LocU] = Unit[LocU] - Question[LocQ];
+          Question[LocQ] = 0;
+          UnitNo[LocQ] = LocU + 1;
+          StatusOfQue[LocQ] = -1;
+        } else if (Unit[LocU] < Question[LocQ]) {
+          part1 = Unit[LocU];
+          part2 = Question[LocQ] - part1;
+
+          shiftArray(Question, LocQ);
+          shiftArray(Question_temp, LocQ);
+          shiftArray(QuestionId, LocQ);
+          shiftArray(StatusOfQue, LocQ);
+          shiftArray(UnitNo, LocQ);
+          Question[LocQ] = part1;
+          Question[LocQ + 1] = part2;
+          Question_temp[LocQ] = part1;
+          Question_temp[LocQ + 1] = part2;
+
+          Unit[LocU] = 0;
+          Question[LocQ] = 0;
+          UnitNo[LocQ] = LocU + 1;
+          StatusOfQue[LocQ] = -1;
+          StatusOfUnit[LocU] = -1;
+        }
+      }
+
+      //************************************* */
+
+      //For Difficulty
+      //status of question and question array updation
+      // System.out.println("for difficulty");
+      for (i = 0; Question_temp[i] != -4; i++) {
+        Question[i] = Question_temp[i];
+        StatusOfQue[i] = 1;
+      }
+      //step 1
+      for (i = 0; Question[i] != -4; i++) {
+        if (StatusOfQue[i] == -1) continue;
+        for (j = 0; Difficulty_level[j] != -4; j++) {
+          if (StatusOfDiff[j] == -1) continue;
+          if (Question[i] == Difficulty_level[j]) {
+            Question[i] = 0;
+            Difficulty_level[j] = 0;
+
+            Difficulty_level_no[i] = j + 1;
+
+            StatusOfQue[i] = -1;
+            StatusOfDiff[j] = -1;
+          }
+        }
+      }
+
+      //end of step 1
+
+      //step two
+
+      for (i = 0; Question[i] != -4; i++) {
+        if (StatusOfQue[i] == -1) continue;
+        for (j = i + 1; Question[j] != -4; j++) {
+          if (StatusOfQue[j] == -1) continue;
+          for (k = 0; Difficulty_level[k] != -4; k++) {
+            if (StatusOfDiff[k] == -1) continue;
+            if (Question[i] + Question[j] == Difficulty_level[k]) {
+              StatusOfQue[i] = -1;
+              StatusOfQue[j] = -1;
+              StatusOfDiff[k] = -1;
+
+              Question[i] = 0;
+              Question[j] = 0;
+              Difficulty_level[k] = 0;
+
+              Difficulty_level_no[i] = k + 1;
+              Difficulty_level_no[j] = k + 1;
+            }
+          }
+        }
+      }
+
+      //step 3
+      while (!checkCondition(StatusOfQue)) {
+        LocQ = maxim(Question);
+        LocU = maxUnit(Difficulty_level, Question[LocQ]);
+        if (Question[LocQ] == Difficulty_level[LocU]) {
+          Difficulty_level[LocU] = 0;
+          Question[LocQ] = 0;
+          Difficulty_level_no[LocQ] = LocU + 1;
+          StatusOfQue[LocQ] = -1;
+          StatusOfDiff[LocU] = -1;
+        } else if (Difficulty_level[LocU] > Question[LocQ]) {
+          Difficulty_level[LocU] = Difficulty_level[LocU] - Question[LocQ];
+          Question[LocQ] = 0;
+          Difficulty_level_no[LocQ] = LocU + 1;
+          StatusOfQue[LocQ] = -1;
+        } else if (Difficulty_level[LocU] < Question[LocQ]) {
+          part1 = Difficulty_level[LocU];
+          part2 = Question[LocQ] - part1;
+
+          shiftArray(Question, LocQ);
+          shiftArray(Question_temp, LocQ);
+          shiftArray(QuestionId, LocQ);
+          shiftArray(StatusOfQue, LocQ);
+          shiftArray(UnitNo, LocQ);
+          shiftArray(Difficulty_level_no, LocQ);
+
+          Question[LocQ] = part1;
+          Question[LocQ + 1] = part2;
+          Question_temp[LocQ] = part1;
+          Question_temp[LocQ + 1] = part2;
+
+          Difficulty_level[LocU] = 0;
+          Question[LocQ] = 0;
+          Difficulty_level_no[LocQ] = LocU + 1;
+          StatusOfQue[LocQ] = -1;
+          StatusOfDiff[LocU] = -1;
+        }
+      }
+
+      //For Cognitive
+      //status of question and question array updation
+      for (i = 0; Question_temp[i] != -4; i++) {
+        Question[i] = Question_temp[i];
+        StatusOfQue[i] = 1;
+      }
+      //step 1
+      for (i = 0; Question[i] != -4; i++) {
+        if (StatusOfQue[i] == -1) continue;
+        for (j = 0; Cognitive_level[j] != -4; j++) {
+          if (StatusOfCog[j] == -1) continue;
+          if (Question[i] == Cognitive_level[j]) {
+            Question[i] = 0;
+            Cognitive_level[j] = 0;
+
+            Difficulty_level_no[i] = j + 1;
+
+            StatusOfQue[i] = -1;
+            StatusOfCog[j] = -1;
+          }
+        }
+      }
+
+      //end of step 1
+
+      //step two
+
+      for (i = 0; Question[i] != -4; i++) {
+        if (StatusOfQue[i] == -1) continue;
+        for (j = i + 1; Question[j] != -4; j++) {
+          if (StatusOfQue[j] == -1) continue;
+          for (k = 0; Cognitive_level[k] != -4; k++) {
+            if (StatusOfCog[k] == -1) continue;
+            if (Question[i] + Question[j] == Cognitive_level[k]) {
+              StatusOfQue[i] = -1;
+              StatusOfQue[j] = -1;
+              StatusOfCog[k] = -1;
+
+              Question[i] = 0;
+              Question[j] = 0;
+              Cognitive_level[k] = 0;
+
+              Cognitive_level_no[i] = k + 1;
+              Cognitive_level_no[j] = k + 1;
+            }
+          }
+        }
+      }
+
+      //step 3
+      while (!checkCondition(StatusOfQue)) {
+        LocQ = maxim(Question);
+        LocU = maxUnit(Cognitive_level, Question[LocQ]);
+        if (Question[LocQ] == Cognitive_level[LocU]) {
+          Cognitive_level[LocU] = 0;
+          Question[LocQ] = 0;
+          Cognitive_level_no[LocQ] = LocU + 1;
+          StatusOfQue[LocQ] = -1;
+          StatusOfCog[LocU] = -1;
+        } else if (Cognitive_level[LocU] > Question[LocQ]) {
+          Cognitive_level[LocU] = Cognitive_level[LocU] - Question[LocQ];
+          Question[LocQ] = 0;
+          Cognitive_level_no[LocQ] = LocU + 1;
+          StatusOfQue[LocQ] = -1;
+        } else if (Cognitive_level[LocU] < Question[LocQ]) {
+          part1 = Cognitive_level[LocU];
+          part2 = Question[LocQ] - part1;
+
+          shiftArray(Question, LocQ);
+          shiftArray(Question_temp, LocQ);
+          shiftArray(QuestionId, LocQ);
+          shiftArray(StatusOfQue, LocQ);
+          shiftArray(UnitNo, LocQ);
+          shiftArray(Difficulty_level_no, LocQ);
+          shiftArray(Cognitive_level_no, LocQ);
+
+          Question[LocQ] = part1;
+          Question[LocQ + 1] = part2;
+          Question_temp[LocQ] = part1;
+          Question_temp[LocQ + 1] = part2;
+
+          Cognitive_level[LocU] = 0;
+          Question[LocQ] = 0;
+          Cognitive_level_no[LocQ] = LocU + 1;
+          StatusOfQue[LocQ] = -1;
+          StatusOfCog[LocU] = -1;
+        }
+      }
+      template_array=[];
+      for (i = 0; QuestionId[i] != -4; i++) {
+        template_array.push({
+          question: QuestionId[i],
+          marks: Question_temp[i],
+          unit: UnitNo[i],
+          cog: Cognitive_level_no[i],
+          diff: Difficulty_level_no[i]
+        });
+      }
+      console.log(template_array);
+      var QuestionList = new Array(template_array.length);
+
+      function check(query, k, msg, callbackReturns) {
+        QuestionSet.countDocuments(query).then(count => {
+          if (count == 0) {
+            callbackReturns();
+          } else {
+            var r = Math.floor(Math.random() * count);
+            QuestionSet.find(query)
+              .limit(1)
+              .skip(r)
+              .then(questions => {
+                var ind;
+                for (ind = 0; ind < QuestionList.length; ind++) {
+                  if (k === ind) {
+                    continue;
+                  }
+                  if (
+                    QuestionList[ind] != null &&
+                    template_array[ind].unit === template_array[k].unit
+                  ) {
+                    let stringSimilarityResult = stringSimilarity.compareTwoStrings(
+                      QuestionList[ind].question,
+                      questions[0].question
+                    );
+                    if (stringSimilarityResult >= 0.6) {
+                      QuestionSet.findOneAndUpdate(
+                        { _id: questions[0].toObject()._id },
+                        { $set: { checked: 1 } },
+                        (err, doc) => {
+                          console.log("checked" + doc);
+                          check(query, k, msg, callbackReturns);
+                        }
+                      );
+                    }
+                  }
+                }
+                if (ind == QuestionList.length) {
+                  QuestionList[k] = questions[0];
+                  if (QuestionList[k] != null) {
+                    console.log("asyncLoop " + msg + " " + k);
+                    QuestionSet.findOneAndUpdate(
+                      { _id: questions[0].toObject()._id },
+                      { $set: { checked: 1 } },
+                      (err, doc) => {
+                        console.log(doc);
+                      }
+                    );
+                  }
+                }
+                callbackReturns();
+              })
+              .catch(err => {});
+          }
+        });
+      }
+
+      function asyncLoop(k, callback) {
+        if (k < template_array.length) {
+          var query = {
+            module: template_array[k].unit,
+            cognitive: template_array[k].cog,
+            difficulty: template_array[k].diff,
+            marks: {
+              $gte: template_array[k].marks - 2,
+              $lte: template_array[k].marks + 2
+            },
+            asked: 0,
+            checked: 0
+          };
+          check(query, k, "one", () => {
+            asyncLoop(k + 1, callback);
+          });
+        } else {
+          callback();
+        }
+      }
+
+      function asyncLoopTwo(k, callback) {
+        if (k < template_array.length && QuestionList[k] == null) {
+          var lt, gt;
+          if (template_array[k].marks <= 5) {
+            lt = 5;
+            gt = 0;
+          } else {
+            lt = 20;
+            gt = 6;
+          }
+          var query = {
+            module: template_array[k].unit,
+            cognitive: template_array[k].cog,
+            difficulty: template_array[k].diff,
+            marks: { $gte: gt, $lte: lt },
+            asked: 0,
+            checked: 0
+          };
+          check(query, k, "two", () => {
+            asyncLoopTwo(k + 1, callback);
+          });
+        } else if (k < template_array.length && QuestionList[k] != null) {
+          asyncLoopTwo(k + 1, callback);
+        } else {
+          callback();
+        }
+      }
+
+      function asyncLoopThird(k, callback) {
+        if (k < template_array.length && QuestionList[k] == null) {
+          var lt, gt;
+          if (template_array[k].marks <= 5) {
+            lt = 5;
+            gt = 0;
+          } else {
+            lt = 20;
+            gt = 6;
+          }
+          var query = {
+            module: template_array[k].unit,
+            $or: [
+              { cognitive: template_array[k].cog },
+              { difficulty: template_array[k].diff }
+            ],
+            marks: { $gte: gt, $lte: lt },
+            asked: 0,
+            checked: 0
+          };
+          check(query, k, "three", () => {
+            asyncLoopThird(k + 1, callback);
+          });
+        } else if (k < template_array.length && QuestionList[k] != null) {
+          asyncLoopThird(k + 1, callback);
+        } else {
+          callback();
+        }
+      }
+      function generatePDF(res) {
+        var documentDefinition = {
+          content: ["Question Paper"]
+        };
+        for (let index = 0; index < template_array.length; index++) {
+          var str = `Q${template_array[index].question}\t${
+            QuestionList[index].question
+          } ${template_array[index].marks} marks\n`;
+          console.log(str);
+          documentDefinition.content.push(str);
+        }
+        console.log("hello");
+        const pdfDoc = pdfMake.createPdf(documentDefinition);
+        pdfDoc.getBase64(data => {
+          res.writeHead(200, {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": 'attachment;filename="filename.pdf"'
+          });
+
+          const download = Buffer.from(data.toString("utf-8"), "base64");
+          res.end(download);
+        });
+      }
+
+      function updateQuestionAsked(k, callbackReturnsTwo) {
+        if (k < QuestionList.length) {
+          QuestionSet.findOneAndUpdate(
+            {
+              _id: QuestionList[k]._id
+            },
+            {
+              $set: {
+                checked: 0
+              },
+              $inc: {
+                asked: 1
+              }
+            }
+          ).then(doc => {
+            updateQuestionAsked(k + 1, callbackReturnsTwo);
+          });
+        } else {
+          callbackReturnsTwo();
+        }
+      }
+
+      asyncLoop(0, () => {
+        asyncLoopTwo(0, () => {
+          asyncLoopThird(0, () => {
+            let flag = false;
+            for (let iterator = 0; iterator < QuestionList.length; iterator++) {
+              if (QuestionList[iterator] == null) {
+                flag = true;
+              }
+            }
+            if (flag) {
+              res.send("not enough questions");
+            } else {
+              updateQuestionAsked(0, () => {
+                generatePDF(res);
+              });
+            }
+            // res.send(QuestionList);
+          });
+        });
+      });
+    });
+  });
 });
 
 router.post("/homepage/addmodel", checkAuth, (req, res, next) => {
@@ -374,19 +936,17 @@ router.post("/homepage/addcourses", checkAuth, (req, res, next) => {
   });
 });
 
-router.get("/homepage/getModels", (req, res)=> {
-  Models.find()
-  .then((data) => {
+router.get("/homepage/getModels", (req, res) => {
+  Models.find().then(data => {
     res.status(200).json(data);
-  })
-})
+  });
+});
 
-router.get('/homepage/getSubjectData', (req, res) => {
+router.get("/homepage/getSubjectData", (req, res) => {
   const subId = req.query.subid;
-  Courses.findOne({subId})
-  .then((data) => {
+  Courses.findOne({ subId }).then(data => {
     res.status(200).json(data);
-  })
+  });
 });
 
 module.exports = router;
