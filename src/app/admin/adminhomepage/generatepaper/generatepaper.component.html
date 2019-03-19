@@ -39,7 +39,7 @@
             <div class="row card-body">
               <div class="col-sm-3" *ngFor="let number of marksList">
                 <label for="unitmark">Unit {{ number }}</label>
-                <input type="number" class="form-control" [(ngModel)]="paperSpecification.unitwiseDistribution[number-1]" name="unit" id="unit" >
+                <input type="number" min="0" class="form-control" [(ngModel)]="paperSpecification.unitwiseDistribution[number-1]" name="unit" id="unit" >
               </div>
             </div>
             <div id="marksError" style="color: red;"></div>
@@ -53,15 +53,15 @@
               <div class="row card-body">
                 <div class="col-sm-4">
                   <label for="easy">Easy</label>
-                  <input type="number" name="easy" [(ngModel)]="paperSpecification.difficulty[0]" id="easy" class="form-control marksInput">
+                  <input type="number" min="0" name="easy" [(ngModel)]="paperSpecification.difficulty[0]" id="easy" class="form-control marksInput">
                 </div>
                 <div class="col-sm-4">
                   <label for="moderate">Moderate</label>
-                  <input type="number" name="moderate" id="moderate" [(ngModel)]="paperSpecification.difficulty[1]" class="form-control">
+                  <input type="number" min="0" name="moderate" id="moderate" [(ngModel)]="paperSpecification.difficulty[1]" class="form-control">
                 </div>
                 <div class="col-sm-4">
                   <label for="difficult">Difficult</label>
-                  <input type="number" name="difficult" id="difficult" [(ngModel)]="paperSpecification.difficulty[2]" class="form-control">
+                  <input type="number" min="0" name="difficult" id="difficult" [(ngModel)]="paperSpecification.difficulty[2]" class="form-control">
                 </div>
               </div>
             </div>
@@ -74,15 +74,15 @@
               <div class="row card-body">
                 <div class="col-sm-4">
                   <label for="application">Application</label>
-                  <input type="number" name="application" [(ngModel)]="paperSpecification.cognitive[0]" id="comprehension" class="form-control">
+                  <input type="number" min="0" name="application" [(ngModel)]="paperSpecification.cognitive[0]" id="comprehension" class="form-control">
                 </div>
                 <div class="col-sm-4">
                   <label for="comprehension">Comprehension</label>
-                  <input type="number" name="comprehension" id="comprehension" [(ngModel)]="paperSpecification.cognitive[1]" class="form-control">
+                  <input type="number" min="0" name="comprehension" id="comprehension" [(ngModel)]="paperSpecification.cognitive[1]" class="form-control">
                 </div>
                 <div class="col-sm-4">
                   <label for="comprehension">Knowledge</label>
-                  <input type="number" name="knowledge" id="knowledge" [(ngModel)]="paperSpecification.cognitive[2]" class="form-control">
+                  <input type="number" min="0" name="knowledge" id="knowledge" [(ngModel)]="paperSpecification.cognitive[2]" class="form-control">
                 </div>
               </div>
             </div>

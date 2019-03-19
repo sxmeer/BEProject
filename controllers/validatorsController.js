@@ -73,10 +73,19 @@ router.get('/courseDetail', function (req, res) {
 });
 router.get('/getRandomQuestion/:id',(req,res)=>{
     console.log(req.params.id);
-    Questions.find({subjectID:req.params.id}).limit(3).then((docs)=>{
-        //random docs and query needs to be changed
-        res.status(200).json(docs);
+    Questions.aggregate([
+      {$match:{
+        subjectID:parseInt(req.params.id),
+        isValid:0
+      }},
+      {$sample:{size:3}}
+    ]).then((docs)=>{
+      res.status(200).json(docs);
     })
+    // Questions.find({subjectID:req.params.id}).limit(3).then((docs)=>{
+    //     //random docs and query needs to be changed
+    //     res.status(200).json(docs);
+    // })
 });
 
 router.get('/markAsValidQuestion/:id',(req,res)=>{

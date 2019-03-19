@@ -13,7 +13,14 @@ var Courses = require("../models/courses");
 var Models = require("../models/models");
 var checkAuth = require("./middleware/admin-check-auth");
 var Model = require("../models/models");
-var QuestionSet = require('../models/questions');
+var QuestionSet = require("../models/questions");
+
+const stringSimilarity = require("string-similarity");
+
+const pdfMake = require("../pdfmake/pdfmake");
+const vfsFonts = require("../pdfmake/vfs_fonts");
+
+pdfMake.vfs = vfsFonts.pdfMake.vfs;
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -59,11 +66,14 @@ router.post("/login", (req, res, next) => {
     });
 });
 
-router.get('/insert', (req, res) => {
-  QuestionSet.updateMany({}, { $set: { checked: 0, asked: 0, isValid:0 } }).then((docs) => {
+router.get("/insert", (req, res) => {
+  QuestionSet.updateMany(
+    {},
+    { $set: { checked: 0, asked: 0, isValid: 0 } }
+  ).then(docs => {
     res.send(docs);
-  })
-})
+  });
+});
 
 router.post("/homepage/addvalidators", checkAuth, (req, res, next) => {
   //   const name = req.body.name;
@@ -334,7 +344,6 @@ router.get("/homepage/getContributors", checkAuth, (req, res, next) => {
 });
 
 router.post("/homepage/generatePaper", (req, res, next) => {
-  console.log(req.body);
   Courses.find({
     subId: req.body.subID
   }).then(course => {
@@ -343,8 +352,6 @@ router.post("/homepage/generatePaper", (req, res, next) => {
     }).then(model => {
       var Course = course[0];
       var ModelOfPaper = model[0];
-      console.log(Course);
-      console.log(ModelOfPaper);
       var QuestionId = new Array(50).fill(-4);
       var Question = new Array(50).fill(-4);
       var Question_temp = new Array(50).fill(-4);
@@ -361,7 +368,6 @@ router.post("/homepage/generatePaper", (req, res, next) => {
       var Cognitive_level = new Array(50).fill(-4);
       var StatusOfCog = new Array(50).fill(-4);
 
-      var i, j, LocQ, LocU, part1, part2;
       for (let iter = 0; iter < ModelOfPaper.questionModelList.length; iter++) {
         QuestionId[iter] = ModelOfPaper.questionModelList[iter].questionNumber;
         Question[iter] = ModelOfPaper.questionModelList[iter].marks;
@@ -373,27 +379,42 @@ router.post("/homepage/generatePaper", (req, res, next) => {
       }
       for (let iter = 0; iter < Course.numberOfModules; iter++) {
         Unit[iter] = req.body.unitwiseDistribution[iter];
-        StatusOfUnit[iter] = 1;
+        if (Unit[iter] == 0) {
+          StatusOfUnit[iter] = -1;
+        } else {
+          StatusOfUnit[iter] = 1;
+        }
       }
       for (let iter = 0; iter < req.body.difficulty.length; iter++) {
         Difficulty_level[iter] = req.body.difficulty[iter];
-        StatusOfDiff[iter] = 1;
+        if (Difficulty_level[iter] == 0) {
+          StatusOfDiff[iter] = -1;
+        } else {
+          StatusOfDiff[iter] = 1;
+        }
         Cognitive_level[iter] = req.body.cognitive[iter];
-        StatusOfCog[iter] = 1;
+        if (Cognitive_level[iter] == 0) {
+          StatusOfCog[iter] = -1;
+        } else {
+          StatusOfCog[iter] = 1;
+        }
       }
       //functions
 
       checkCondition = function(array) {
-        for (i = 0; array[i] != -4; i++) {
+        for (let i = 0; array[i] != -4; i++) {
           if (array[i] == 1) return false;
         }
         return true;
       };
 
-      maxim = function(array) {
-        LocQq = -1;
-        maxi = -99;
-        for (i = 0; array[i] != -4; i++) {
+      maxim = function(array, status) {
+        let LocQq = -1;
+        let maxi = -99;
+        for (let i = 0; array[i] != -4; i++) {
+          if (status[i] == -1) {
+            continue;
+          }
           if (array[i] > maxi) {
             maxi = array[i];
             LocQq = i;
@@ -401,10 +422,14 @@ router.post("/homepage/generatePaper", (req, res, next) => {
         }
         return LocQq;
       };
-      maxUnit = function(array, questionMax) {
-        (LocUu = -1), i;
-        diff = -1000;
-        for (i = 0; array[i] != -4; i++) {
+      maxUnit = function(array, status, questionMax) {
+        let LocUu = -1,
+          i;
+        let diff = -1000;
+        for (let i = 0; array[i] != -4; i++) {
+          if (status[i] == -1) {
+            continue;
+          }
           if (questionMax - array[i] > 0) continue;
           if (questionMax - array[i] > diff) {
             diff = questionMax - array[i];
@@ -412,22 +437,23 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           }
         }
         if (LocUu == -1) {
-          LocUu = maxim(array);
+          LocUu = maxim(array, status);
         }
         return LocUu;
       };
       shiftArray = function(array, pos) {
-        i, (count = 0);
-        for (i = 0; array[i] != -4; i++) count++;
-        for (i = count; i > pos; i--) {
+        let i,
+          count = 0;
+        for (let i = 0; array[i] != -4; i++) count++;
+        for (let i = count; i > pos; i--) {
           array[i] = array[i - 1];
         }
       };
 
       // step1
-      for (i = 0; Question[i] != -4; i++) {
+      for (let i = 0; Question[i] != -4; i++) {
         if (StatusOfQue[i] == -1) continue;
-        for (j = 0; Unit[j] != -4; j++) {
+        for (let j = 0; Unit[j] != -4; j++) {
           if (StatusOfUnit[j] == -1) continue;
           if (Question[i] == Unit[j]) {
             Question[i] = 0;
@@ -437,16 +463,18 @@ router.post("/homepage/generatePaper", (req, res, next) => {
 
             StatusOfQue[i] = -1;
             StatusOfUnit[j] = -1;
+            break; //added
           }
         }
       }
 
       //step 2
-      for (i = 0; Question[i] != -4; i++) {
+      for (let i = 0; Question[i] != -4; i++) {
+        let flag = false; //added
         if (StatusOfQue[i] == -1) continue;
-        for (j = i + 1; Question[j] != -4; j++) {
+        for (let j = i + 1; Question[j] != -4; j++) {
           if (StatusOfQue[j] == -1) continue;
-          for (k = 0; Unit[k] != -4; k++) {
+          for (let k = 0; Unit[k] != -4; k++) {
             if (StatusOfUnit[k] == -1) continue;
             if (Question[i] + Question[j] == Unit[k]) {
               StatusOfQue[i] = -1;
@@ -459,16 +487,22 @@ router.post("/homepage/generatePaper", (req, res, next) => {
 
               UnitNo[i] = k + 1;
               UnitNo[j] = k + 1;
+              flag = true; //added
+              break; //added
             }
           }
+          if (flag) {
+            //added
+            break; //added
+          } //added
         }
       }
 
       //step 3
 
       while (!checkCondition(StatusOfQue)) {
-        LocQ = maxim(Question);
-        LocU = maxUnit(Unit, Question[LocQ]);
+        let LocQ = maxim(Question, StatusOfQue);
+        let LocU = maxUnit(Unit, StatusOfUnit, Question[LocQ]);
         if (Question[LocQ] == Unit[LocU]) {
           Unit[LocU] = 0;
           Question[LocQ] = 0;
@@ -481,8 +515,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           UnitNo[LocQ] = LocU + 1;
           StatusOfQue[LocQ] = -1;
         } else if (Unit[LocU] < Question[LocQ]) {
-          part1 = Unit[LocU];
-          part2 = Question[LocQ] - part1;
+          let part1 = Unit[LocU];
+          let part2 = Question[LocQ] - part1;
 
           shiftArray(Question, LocQ);
           shiftArray(Question_temp, LocQ);
@@ -493,6 +527,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           Question[LocQ + 1] = part2;
           Question_temp[LocQ] = part1;
           Question_temp[LocQ + 1] = part2;
+          QuestionId[LocQ + 1] = QuestionId[LocQ]; //added
+          StatusOfQue[LocQ + 1] = StatusOfQue[LocQ]; //added
 
           Unit[LocU] = 0;
           Question[LocQ] = 0;
@@ -501,20 +537,30 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           StatusOfUnit[LocU] = -1;
         }
       }
-
+      template_array = [];
+      for (let i = 0; QuestionId[i] != -4; i++) {
+        template_array.push({
+          question: QuestionId[i],
+          marks: Question_temp[i],
+          unit: UnitNo[i],
+          cog: Cognitive_level_no[i],
+          diff: Difficulty_level_no[i]
+        });
+      }
+      console.log(template_array);
       //************************************* */
 
       //For Difficulty
       //status of question and question array updation
       // System.out.println("for difficulty");
-      for (i = 0; Question_temp[i] != -4; i++) {
+      for (let i = 0; Question_temp[i] != -4; i++) {
         Question[i] = Question_temp[i];
         StatusOfQue[i] = 1;
       }
       //step 1
-      for (i = 0; Question[i] != -4; i++) {
+      for (let i = 0; Question[i] != -4; i++) {
         if (StatusOfQue[i] == -1) continue;
-        for (j = 0; Difficulty_level[j] != -4; j++) {
+        for (let j = 0; Difficulty_level[j] != -4; j++) {
           if (StatusOfDiff[j] == -1) continue;
           if (Question[i] == Difficulty_level[j]) {
             Question[i] = 0;
@@ -524,6 +570,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
 
             StatusOfQue[i] = -1;
             StatusOfDiff[j] = -1;
+            break; //added
           }
         }
       }
@@ -532,11 +579,12 @@ router.post("/homepage/generatePaper", (req, res, next) => {
 
       //step two
 
-      for (i = 0; Question[i] != -4; i++) {
+      for (let i = 0; Question[i] != -4; i++) {
+        let flag = false; //added
         if (StatusOfQue[i] == -1) continue;
-        for (j = i + 1; Question[j] != -4; j++) {
+        for (let j = i + 1; Question[j] != -4; j++) {
           if (StatusOfQue[j] == -1) continue;
-          for (k = 0; Difficulty_level[k] != -4; k++) {
+          for (let k = 0; Difficulty_level[k] != -4; k++) {
             if (StatusOfDiff[k] == -1) continue;
             if (Question[i] + Question[j] == Difficulty_level[k]) {
               StatusOfQue[i] = -1;
@@ -549,15 +597,21 @@ router.post("/homepage/generatePaper", (req, res, next) => {
 
               Difficulty_level_no[i] = k + 1;
               Difficulty_level_no[j] = k + 1;
+              flag = true; //added
+              break; //added
             }
           }
+          if (flag) {
+            //added
+            break; //added
+          } //added
         }
       }
 
       //step 3
       while (!checkCondition(StatusOfQue)) {
-        LocQ = maxim(Question);
-        LocU = maxUnit(Difficulty_level, Question[LocQ]);
+        let LocQ = maxim(Question, StatusOfQue);
+        let LocU = maxUnit(Difficulty_level, StatusOfDiff, Question[LocQ]);
         if (Question[LocQ] == Difficulty_level[LocU]) {
           Difficulty_level[LocU] = 0;
           Question[LocQ] = 0;
@@ -570,8 +624,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           Difficulty_level_no[LocQ] = LocU + 1;
           StatusOfQue[LocQ] = -1;
         } else if (Difficulty_level[LocU] < Question[LocQ]) {
-          part1 = Difficulty_level[LocU];
-          part2 = Question[LocQ] - part1;
+          let part1 = Difficulty_level[LocU];
+          let part2 = Question[LocQ] - part1;
 
           shiftArray(Question, LocQ);
           shiftArray(Question_temp, LocQ);
@@ -584,6 +638,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           Question[LocQ + 1] = part2;
           Question_temp[LocQ] = part1;
           Question_temp[LocQ + 1] = part2;
+          QuestionId[LocQ + 1] = QuestionId[LocQ]; //added
+          StatusOfQue[LocQ + 1] = StatusOfQue[LocQ]; //added
 
           Difficulty_level[LocU] = 0;
           Question[LocQ] = 0;
@@ -592,26 +648,38 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           StatusOfDiff[LocU] = -1;
         }
       }
+      template_array = [];
+      for (let i = 0; QuestionId[i] != -4; i++) {
+        template_array.push({
+          question: QuestionId[i],
+          marks: Question_temp[i],
+          unit: UnitNo[i],
+          cog: Cognitive_level_no[i],
+          diff: Difficulty_level_no[i]
+        });
+      }
+      console.log(template_array);
 
       //For Cognitive
       //status of question and question array updation
-      for (i = 0; Question_temp[i] != -4; i++) {
+      for (let i = 0; Question_temp[i] != -4; i++) {
         Question[i] = Question_temp[i];
         StatusOfQue[i] = 1;
       }
       //step 1
-      for (i = 0; Question[i] != -4; i++) {
+      for (let i = 0; Question[i] != -4; i++) {
         if (StatusOfQue[i] == -1) continue;
-        for (j = 0; Cognitive_level[j] != -4; j++) {
+        for (let j = 0; Cognitive_level[j] != -4; j++) {
           if (StatusOfCog[j] == -1) continue;
           if (Question[i] == Cognitive_level[j]) {
             Question[i] = 0;
             Cognitive_level[j] = 0;
 
-            Difficulty_level_no[i] = j + 1;
+            Cognitive_level_no[i] = j + 1;
 
             StatusOfQue[i] = -1;
             StatusOfCog[j] = -1;
+            break; //added
           }
         }
       }
@@ -620,11 +688,12 @@ router.post("/homepage/generatePaper", (req, res, next) => {
 
       //step two
 
-      for (i = 0; Question[i] != -4; i++) {
+      for (let i = 0; Question[i] != -4; i++) {
+        let flag = false; //added
         if (StatusOfQue[i] == -1) continue;
-        for (j = i + 1; Question[j] != -4; j++) {
+        for (let j = i + 1; Question[j] != -4; j++) {
           if (StatusOfQue[j] == -1) continue;
-          for (k = 0; Cognitive_level[k] != -4; k++) {
+          for (let k = 0; Cognitive_level[k] != -4; k++) {
             if (StatusOfCog[k] == -1) continue;
             if (Question[i] + Question[j] == Cognitive_level[k]) {
               StatusOfQue[i] = -1;
@@ -637,15 +706,21 @@ router.post("/homepage/generatePaper", (req, res, next) => {
 
               Cognitive_level_no[i] = k + 1;
               Cognitive_level_no[j] = k + 1;
+              flag = true; //added
+              break; //added
             }
           }
+          if (flag) {
+            //added
+            break; //added
+          } //added
         }
       }
 
       //step 3
       while (!checkCondition(StatusOfQue)) {
-        LocQ = maxim(Question);
-        LocU = maxUnit(Cognitive_level, Question[LocQ]);
+        let LocQ = maxim(Question, StatusOfQue);
+        let LocU = maxUnit(Cognitive_level, StatusOfCog, Question[LocQ]);
         if (Question[LocQ] == Cognitive_level[LocU]) {
           Cognitive_level[LocU] = 0;
           Question[LocQ] = 0;
@@ -658,8 +733,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           Cognitive_level_no[LocQ] = LocU + 1;
           StatusOfQue[LocQ] = -1;
         } else if (Cognitive_level[LocU] < Question[LocQ]) {
-          part1 = Cognitive_level[LocU];
-          part2 = Question[LocQ] - part1;
+          let part1 = Cognitive_level[LocU];
+          let part2 = Question[LocQ] - part1;
 
           shiftArray(Question, LocQ);
           shiftArray(Question_temp, LocQ);
@@ -673,6 +748,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           Question[LocQ + 1] = part2;
           Question_temp[LocQ] = part1;
           Question_temp[LocQ + 1] = part2;
+          QuestionId[LocQ + 1] = QuestionId[LocQ]; //added
+          StatusOfQue[LocQ + 1] = StatusOfQue[LocQ]; //added
 
           Cognitive_level[LocU] = 0;
           Question[LocQ] = 0;
@@ -681,8 +758,9 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           StatusOfCog[LocU] = -1;
         }
       }
-      template_array=[];
-      for (i = 0; QuestionId[i] != -4; i++) {
+
+      template_array = [];
+      for (let i = 0; QuestionId[i] != -4; i++) {
         template_array.push({
           question: QuestionId[i],
           marks: Question_temp[i],
@@ -752,6 +830,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
       function asyncLoop(k, callback) {
         if (k < template_array.length) {
           var query = {
+            subjectID: req.body.subID,
+            asked:0,
             module: template_array[k].unit,
             cognitive: template_array[k].cog,
             difficulty: template_array[k].diff,
@@ -781,6 +861,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
             gt = 6;
           }
           var query = {
+            subjectID: req.body.subID,
+            asked:0,
             module: template_array[k].unit,
             cognitive: template_array[k].cog,
             difficulty: template_array[k].diff,
@@ -809,6 +891,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
             gt = 6;
           }
           var query = {
+            subjectID: req.body.subID,
+            asked:0,
             module: template_array[k].unit,
             $or: [
               { cognitive: template_array[k].cog },
@@ -850,6 +934,40 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           res.end(download);
         });
       }
+      function unsuccessfullUpdate(k, callbackReturnsThree) {
+        if (k < QuestionList.length && QuestionList[k] == null) {
+          unsuccessfullUpdate(k + 1, callbackReturnsThree);
+        } else if (k < QuestionList.length) {
+          QuestionSet.findOneAndUpdate(
+            {
+              _id: QuestionList[k]._id
+            },
+            {
+              $set: {
+                checked: 0
+              }
+            }
+          ).then(doc => {
+            unsuccessfullUpdate(k + 1, callbackReturnsThree);
+          });
+        } else {
+          callbackReturnsThree();
+        }
+      }
+
+      function updatePreviouslyAskedQuestions(ch,callbackReturnsFour){
+        QuestionSet.updateMany(
+          {
+            subjectID: req.body.subID,
+            asked: { $gt:0 }
+          },
+          {
+            $inc: { asked:-1 }
+          }
+        ).then(docs => {
+          callbackReturnsFour();
+        });
+      }
 
       function updateQuestionAsked(k, callbackReturnsTwo) {
         if (k < QuestionList.length) {
@@ -862,7 +980,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
                 checked: 0
               },
               $inc: {
-                asked: 1
+                asked: 2
               }
             }
           ).then(doc => {
@@ -883,10 +1001,15 @@ router.post("/homepage/generatePaper", (req, res, next) => {
               }
             }
             if (flag) {
-              res.send("not enough questions");
+              unsuccessfullUpdate(0, () => {
+                console.log("not enough questions");
+                res.send("not enough questions");
+              });
             } else {
-              updateQuestionAsked(0, () => {
-                generatePDF(res);
+              updatePreviouslyAskedQuestions(0,()=>{
+                updateQuestionAsked(0, () => {
+                  generatePDF(res);
+                });
               });
             }
             // res.send(QuestionList);
