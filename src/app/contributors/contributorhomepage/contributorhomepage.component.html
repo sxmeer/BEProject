@@ -1,17 +1,19 @@
-<div class="row">
-  <div class="col mt-2">
-    <div class="container">
-      <app-contributormoduledescription></app-contributormoduledescription>
-    </div>
-  </div>
-  <div class="col mt-2">
-    <button (click)="addQuestion()" class="btn btn-info mb-2">Add Question Component</button>
-    <div id="quesContainer">
-      <div id="question-container">
-        <app-contributorquestion *ngFor="let question of questionList" [id]="question" (removeEmitter)="remover($event)">
-        </app-contributorquestion>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col mt-2">
+      <div class="container">
+        <app-contributormoduledescription></app-contributormoduledescription>
       </div>
     </div>
-    <button (click)="submitQuestions()" class="mt-2 btn btn-outline-warning">Submit</button>
+    <div class="col mt-2">
+      <button (click)="addQuestion()" class="btn btn-info mb-2">Add Question Component</button>
+      <div id="quesContainer">
+        <div id="question-container">
+          <app-contributorquestion *ngFor="let question of questionList" [id]="question" (removeEmitter)="remover($event)">
+          </app-contributorquestion>
+        </div>
+      </div>
+      <button (click)="submitQuestions()" class="mt-2 btn btn-outline-warning">Submit</button>
+    </div>
   </div>
 </div>

@@ -81,11 +81,30 @@ export class GeneratepaperComponent implements OnInit {
     this.modelDesc = this.models.filter(item => {
       return item._id === this.paperSpecification.modelID;
     })[0];
-    this.questionDesc = JSON.stringify(
-      this.modelDesc.questionModelList,
-      undefined,
-      2
-    );
+    let index = 0;
+    let char = 'a';
+    for (let i = 0; i < this.modelDesc.questionModelList.length; i++) {
+      if (index === 0) {
+        this.questionDesc = '<div class="card-body">';
+        index++;
+      }
+      if (index === this.modelDesc.questionModelList[i].questionNumber) {
+        this.questionDesc += this.modelDesc.questionModelList[i].questionNumber + '.' + char + '>  -  '
+          + this.modelDesc.questionModelList[i].marks + ' Marks <br>';
+          char = this.nextChar(char);
+      } else {
+        this.questionDesc += '</div>';
+        if (this.modelDesc.questionModelList[i].questionNumber <= this.modelDesc.numberOfQuestions) {
+          char = 'a';
+          i--;
+          index++;
+          this.questionDesc += '<div class="card-body">';
+        }
+      }
+    }
+  }
+  nextChar(c: string) {
+    return String.fromCharCode(c.charCodeAt(0) + 1);
   }
 
   onSubjectSelected() {
@@ -109,8 +128,8 @@ export class GeneratepaperComponent implements OnInit {
       sumOfMarks += this.paperSpecification.unitwiseDistribution[i];
     }
     if (sumOfMarks !== this.modelDesc.totalMarks) {
-      document.getElementById("marksError").innerText =
-        "Sum of marks of Unitwise distribution must be equal to " +
+      document.getElementById('marksError').innerText =
+        'Sum of marks of Unitwise distribution must be equal to ' +
         this.modelDesc.totalMarks;
       this.clearFunction();
       return;
@@ -120,8 +139,8 @@ export class GeneratepaperComponent implements OnInit {
       sumOfMarks += this.paperSpecification.difficulty[i];
     }
     if (sumOfMarks !== this.modelDesc.totalMarks) {
-      document.getElementById("diffError").innerText =
-        "Sum of marks of difficulty level must be equal to " +
+      document.getElementById('diffError').innerText =
+        'Sum of marks of difficulty level must be equal to ' +
         this.modelDesc.totalMarks;
       this.clearFunction();
       return;
@@ -131,8 +150,8 @@ export class GeneratepaperComponent implements OnInit {
       sumOfMarks += this.paperSpecification.cognitive[i];
     }
     if (sumOfMarks !== this.modelDesc.totalMarks) {
-      document.getElementById("cogError").innerText =
-        "Sum of marks of congitive level must be equal to " +
+      document.getElementById('cogError').innerText =
+        'Sum of marks of congitive level must be equal to ' +
         this.modelDesc.totalMarks;
       this.clearFunction();
       return;
@@ -143,9 +162,9 @@ export class GeneratepaperComponent implements OnInit {
   }
   clearFunction() {
     setTimeout(() => {
-      document.getElementById("marksError").innerText = "";
-      document.getElementById("diffError").innerText = "";
-      document.getElementById("cogError").innerText = "";
+      document.getElementById('marksError').innerText = '';
+      document.getElementById('diffError').innerText = '';
+      document.getElementById('cogError').innerText = '';
     }, 3000);
   }
 }

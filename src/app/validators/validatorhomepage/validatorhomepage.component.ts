@@ -9,7 +9,7 @@ import { ValidatordataService } from '../validatordata.service';
 export class ValidatorhomepageComponent implements OnInit {
   diff = ["Easy", "Medium", "Difficult"];
   cog = ["Application","Comprehension","Knowledge"];
-  constructor(private dataService:ValidatordataService) { }
+  constructor(public dataService: ValidatordataService) { }
   ngOnInit() {
   }
   addQuestion(){
