@@ -15,12 +15,10 @@ var checkAuth = require("./middleware/admin-check-auth");
 var Model = require("../models/models");
 var QuestionSet = require("../models/questions");
 
+var pdfMakePrinter = require("pdfmake/src/printer");
+var fs = require("fs");
+
 const stringSimilarity = require("string-similarity");
-
-const pdfMake = require("../pdfmake/pdfmake");
-const vfsFonts = require("../pdfmake/vfs_fonts");
-
-pdfMake.vfs = vfsFonts.pdfMake.vfs;
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -831,7 +829,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
         if (k < template_array.length) {
           var query = {
             subjectID: req.body.subID,
-            asked:0,
+            asked: 0,
             module: template_array[k].unit,
             cognitive: template_array[k].cog,
             difficulty: template_array[k].diff,
@@ -862,7 +860,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           }
           var query = {
             subjectID: req.body.subID,
-            asked:0,
+            asked: 0,
             module: template_array[k].unit,
             cognitive: template_array[k].cog,
             difficulty: template_array[k].diff,
@@ -892,7 +890,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           }
           var query = {
             subjectID: req.body.subID,
-            asked:0,
+            asked: 0,
             module: template_array[k].unit,
             $or: [
               { cognitive: template_array[k].cog },
@@ -923,16 +921,53 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           documentDefinition.content.push(str);
         }
         console.log("hello");
-        const pdfDoc = pdfMake.createPdf(documentDefinition);
-        pdfDoc.getBase64(data => {
-          res.writeHead(200, {
-            "Content-Type": "application/pdf",
-            "Content-Disposition": 'attachment;filename="filename.pdf"'
+        var fontDescriptors = {
+          Roboto: {
+            normal:
+              "node_modules/roboto-font/fonts/Roboto/roboto-regular-webfont.ttf",
+            bold:
+              "node_modules/roboto-font/fonts/Roboto/roboto-bold-webfont.ttf",
+            italics:
+              "node_modules/roboto-font/fonts/Roboto/roboto-italic-webfont.ttf",
+            bolditalics:
+              "node_modules/roboto-font/fonts/Roboto/roboto-bolditalic-webfont.ttf"
+          }
+        };
+        var printer = new pdfMakePrinter(fontDescriptors);
+        var doc = printer.createPdfKitDocument(documentDefinition);
+        var link = `D:/BE/BE project/QuestionPaperGeneratorV1/new/Media/QuestionPaper-${new Date().getTime()}.pdf`;
+        doc.pipe(
+          fs.createWriteStream(link).on("error", err => {
+            console.log(err.message);
+            // errorCallback(err.message);
+          })
+        );
+        doc.on("end", () => {
+          console.log("PDF successfully created and stored");
+          const mailOptions = {
+            from: "wtlminiproject84@gmail.com",
+            to: "sameeryadav2421@gmail.com",
+            subject: "Generated Paper",
+            text: "checkout the attached pdf",
+            attachments: [
+              {
+                filename: "paper.pdf",
+                path: link,
+                contentType: "application/pdf"
+              }
+            ]
+          };
+          transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+              console.log(error);
+              res.status(404).json({ msg: "Failed to send mail" });
+            } else {
+              console.log("Email sent: " + info.response);
+              res.status(200).json({ msg: info.response });
+            }
           });
-
-          const download = Buffer.from(data.toString("utf-8"), "base64");
-          res.end(download);
         });
+        doc.end();
       }
       function unsuccessfullUpdate(k, callbackReturnsThree) {
         if (k < QuestionList.length && QuestionList[k] == null) {
@@ -955,14 +990,14 @@ router.post("/homepage/generatePaper", (req, res, next) => {
         }
       }
 
-      function updatePreviouslyAskedQuestions(ch,callbackReturnsFour){
+      function updatePreviouslyAskedQuestions(ch, callbackReturnsFour) {
         QuestionSet.updateMany(
           {
             subjectID: req.body.subID,
-            asked: { $gt:0 }
+            asked: { $gt: 0 }
           },
           {
-            $inc: { asked:-1 }
+            $inc: { asked: -1 }
           }
         ).then(docs => {
           callbackReturnsFour();
@@ -1003,10 +1038,13 @@ router.post("/homepage/generatePaper", (req, res, next) => {
             if (flag) {
               unsuccessfullUpdate(0, () => {
                 console.log("not enough questions");
-                res.send("not enough questions");
+                res.status(404).json({
+                  msg: "not enough questions"
+                });
+                // res.send("not enough questions");
               });
             } else {
-              updatePreviouslyAskedQuestions(0,()=>{
+              updatePreviouslyAskedQuestions(0, () => {
                 updateQuestionAsked(0, () => {
                   generatePDF(res);
                 });
