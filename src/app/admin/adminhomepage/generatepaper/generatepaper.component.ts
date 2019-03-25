@@ -5,6 +5,7 @@ import { Department } from "../../department.model";
 import { Semester } from "../../semesters.model";
 import { Subjects } from "../../subjects.model";
 import { HttpClient } from "@angular/common/http";
+import { saveAs } from "file-saver";
 
 @Component({
   selector: "app-generatepaper",
@@ -157,7 +158,10 @@ export class GeneratepaperComponent implements OnInit {
       return;
     }
     console.log(this.paperSpecification);
-    this.http.post('http://localhost:3000/admin/homepage/generatePaper', this.paperSpecification).subscribe(() => {
+    this.http.post<{msg:string}>('http://localhost:3000/admin/homepage/generatePaper', this.paperSpecification).subscribe((data) => {
+      alert(data.msg);
+    }, err => {
+      alert(err.msg);
     });
   }
   clearFunction() {

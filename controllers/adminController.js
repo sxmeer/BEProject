@@ -16,12 +16,10 @@ var checkAuth = require("./middleware/admin-check-auth");
 var Model = require("../models/models");
 var QuestionSet = require("../models/questions");
 
+var pdfMakePrinter = require("pdfmake/src/printer");
+var fs = require("fs");
+
 const stringSimilarity = require("string-similarity");
-
-const pdfMake = require("../pdfmake/pdfmake");
-const vfsFonts = require("../pdfmake/vfs_fonts");
-
-pdfMake.vfs = vfsFonts.pdfMake.vfs;
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -346,6 +344,7 @@ router.get("/homepage/getContributors", checkAuth, (req, res, next) => {
 });
 
 router.post("/homepage/generatePaper", (req, res, next) => {
+  console.log("hit")
   Courses.find({
     subId: req.body.subID
   }).then(course => {
@@ -370,6 +369,9 @@ router.post("/homepage/generatePaper", (req, res, next) => {
       var Cognitive_level = new Array(50).fill(-4);
       var StatusOfCog = new Array(50).fill(-4);
 
+      var subQuestion = new Array(50).fill(-4);
+      var subSubQuestion = new Array(50).fill(-4);
+
       for (let iter = 0; iter < ModelOfPaper.questionModelList.length; iter++) {
         QuestionId[iter] = ModelOfPaper.questionModelList[iter].questionNumber;
         Question[iter] = ModelOfPaper.questionModelList[iter].marks;
@@ -378,6 +380,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
         UnitNo[iter] = 0;
         Difficulty_level_no[iter] = 0;
         Cognitive_level_no[iter] = 0;
+        subSubQuestion[iter]=1;
+        subQuestion[iter]="A";
       }
       for (let iter = 0; iter < Course.numberOfModules; iter++) {
         Unit[iter] = req.body.unitwiseDistribution[iter];
@@ -399,6 +403,14 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           StatusOfCog[iter] = -1;
         } else {
           StatusOfCog[iter] = 1;
+        }
+      }
+
+      for (let iter = 1; QuestionId[iter] != -4; iter++) {
+        if (QuestionId[iter] == QuestionId[iter - 1]) {
+          subQuestion[iter] = String.fromCharCode(subQuestion[iter - 1].charCodeAt(0) + 1);
+        } else {
+          subQuestion[iter] = "A";
         }
       }
       //functions
@@ -451,7 +463,6 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           array[i] = array[i - 1];
         }
       };
-
       // step1
       for (let i = 0; Question[i] != -4; i++) {
         if (StatusOfQue[i] == -1) continue;
@@ -532,6 +543,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           QuestionId[LocQ + 1] = QuestionId[LocQ]; //added
           StatusOfQue[LocQ + 1] = StatusOfQue[LocQ]; //added
 
+          shiftArray(subQuestion, LocQ);
+
           Unit[LocU] = 0;
           Question[LocQ] = 0;
           UnitNo[LocQ] = LocU + 1;
@@ -550,6 +563,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
         });
       }
       console.log(template_array);
+      console.log("end");
       //************************************* */
 
       //For Difficulty
@@ -643,6 +657,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           QuestionId[LocQ + 1] = QuestionId[LocQ]; //added
           StatusOfQue[LocQ + 1] = StatusOfQue[LocQ]; //added
 
+          shiftArray(subQuestion, LocQ);
+
           Difficulty_level[LocU] = 0;
           Question[LocQ] = 0;
           Difficulty_level_no[LocQ] = LocU + 1;
@@ -660,6 +676,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           diff: Difficulty_level_no[i]
         });
       }
+      console.log("Step 1");
       console.log(template_array);
 
       //For Cognitive
@@ -753,6 +770,8 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           QuestionId[LocQ + 1] = QuestionId[LocQ]; //added
           StatusOfQue[LocQ + 1] = StatusOfQue[LocQ]; //added
 
+          shiftArray(subQuestion, LocQ);
+
           Cognitive_level[LocU] = 0;
           Question[LocQ] = 0;
           Cognitive_level_no[LocQ] = LocU + 1;
@@ -760,11 +779,24 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           StatusOfCog[LocU] = -1;
         }
       }
-
+      let counter = 1;
+      for (let i = 1; QuestionId[i] != -4; i++) {
+        if (
+          subQuestion[i] === subQuestion[i - 1] &&
+          QuestionId[i] === QuestionId[i - 1]
+        ) {
+          subSubQuestion[i] = ++counter;
+        } else {
+          counter = 1;
+          subSubQuestion[i] = counter;
+        }
+      }
       template_array = [];
       for (let i = 0; QuestionId[i] != -4; i++) {
         template_array.push({
           question: QuestionId[i],
+          subQuestion: subQuestion[i],
+          subSubQuestion: subSubQuestion[i],
           marks: Question_temp[i],
           unit: UnitNo[i],
           cog: Cognitive_level_no[i],
@@ -793,10 +825,12 @@ router.post("/homepage/generatePaper", (req, res, next) => {
                     QuestionList[ind] != null &&
                     template_array[ind].unit === template_array[k].unit
                   ) {
+
                     let stringSimilarityResult = stringSimilarity.compareTwoStrings(
                       QuestionList[ind].question,
                       questions[0].question
                     );
+                    console.log("check"+stringSimilarityResult);
                     if (stringSimilarityResult >= 0.6) {
                       QuestionSet.findOneAndUpdate(
                         { _id: questions[0].toObject()._id },
@@ -833,7 +867,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
         if (k < template_array.length) {
           var query = {
             subjectID: req.body.subID,
-            asked:0,
+            asked: 0,
             module: template_array[k].unit,
             cognitive: template_array[k].cog,
             difficulty: template_array[k].diff,
@@ -864,7 +898,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           }
           var query = {
             subjectID: req.body.subID,
-            asked:0,
+            asked: 0,
             module: template_array[k].unit,
             cognitive: template_array[k].cog,
             difficulty: template_array[k].diff,
@@ -894,7 +928,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           }
           var query = {
             subjectID: req.body.subID,
-            asked:0,
+            asked: 0,
             module: template_array[k].unit,
             $or: [
               { cognitive: template_array[k].cog },
@@ -918,23 +952,58 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           content: ["Question Paper"]
         };
         for (let index = 0; index < template_array.length; index++) {
-          var str = `Q${template_array[index].question}\t${
-            QuestionList[index].question
-          } ${template_array[index].marks} marks\n`;
+          var str = `Q${template_array[index].question})${template_array[index].subQuestion})${template_array[index].subSubQuestion})\t${QuestionList[index].question} ${template_array[index].marks} marks\n`;
           console.log(str);
           documentDefinition.content.push(str);
         }
         console.log("hello");
-        const pdfDoc = pdfMake.createPdf(documentDefinition);
-        pdfDoc.getBase64(data => {
-          res.writeHead(200, {
-            "Content-Type": "application/pdf",
-            "Content-Disposition": 'attachment;filename="filename.pdf"'
+        var fontDescriptors = {
+          Roboto: {
+            normal:
+              "node_modules/roboto-font/fonts/Roboto/roboto-regular-webfont.ttf",
+            bold:
+              "node_modules/roboto-font/fonts/Roboto/roboto-bold-webfont.ttf",
+            italics:
+              "node_modules/roboto-font/fonts/Roboto/roboto-italic-webfont.ttf",
+            bolditalics:
+              "node_modules/roboto-font/fonts/Roboto/roboto-bolditalic-webfont.ttf"
+          }
+        };
+        var printer = new pdfMakePrinter(fontDescriptors);
+        var doc = printer.createPdfKitDocument(documentDefinition);
+        var link = `D:/BE/BE project/QuestionPaperGeneratorV1/new/Media/QuestionPaper-${new Date().getTime()}.pdf`;
+        doc.pipe(
+          fs.createWriteStream(link).on("error", err => {
+            console.log(err.message);
+            // errorCallback(err.message);
+          })
+        );
+        doc.on("end", () => {
+          console.log("PDF successfully created and stored");
+          const mailOptions = {
+            from: "wtlminiproject84@gmail.com",
+            to: "sameeryadav2421@gmail.com",
+            subject: "Generated Paper",
+            text: "checkout the attached pdf",
+            attachments: [
+              {
+                filename: "paper.pdf",
+                path: link,
+                contentType: "application/pdf"
+              }
+            ]
+          };
+          transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+              console.log(error);
+              res.status(404).json({ msg: "Failed to send mail" });
+            } else {
+              console.log("Email sent: " + info.response);
+              res.status(200).json({ msg: "E-mail sent to admin" });
+            }
           });
-
-          const download = Buffer.from(data.toString("utf-8"), "base64");
-          res.end(download);
         });
+        doc.end();
       }
       function unsuccessfullUpdate(k, callbackReturnsThree) {
         if (k < QuestionList.length && QuestionList[k] == null) {
@@ -957,14 +1026,14 @@ router.post("/homepage/generatePaper", (req, res, next) => {
         }
       }
 
-      function updatePreviouslyAskedQuestions(ch,callbackReturnsFour){
+      function updatePreviouslyAskedQuestions(ch, callbackReturnsFour) {
         QuestionSet.updateMany(
           {
             subjectID: req.body.subID,
-            asked: { $gt:0 }
+            asked: { $gt: 0 }
           },
           {
-            $inc: { asked:-1 }
+            $inc: { asked: -1 }
           }
         ).then(docs => {
           callbackReturnsFour();
@@ -1005,16 +1074,17 @@ router.post("/homepage/generatePaper", (req, res, next) => {
             if (flag) {
               unsuccessfullUpdate(0, () => {
                 console.log("not enough questions");
-                res.send("not enough questions");
+                res.status(404).json({
+                  msg: "not enough questions"
+                });
               });
             } else {
-              updatePreviouslyAskedQuestions(0,()=>{
+              updatePreviouslyAskedQuestions(0, () => {
                 updateQuestionAsked(0, () => {
                   generatePDF(res);
                 });
               });
             }
-            // res.send(QuestionList);
           });
         });
       });
@@ -1022,7 +1092,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
   });
 });
 
-router.post("/homepage/addmodel", checkAuth, (req, res, next) => {
+router.post("/homepage/addmodel", (req, res, next) => {
   console.log("hit");
 
   const model = new Models({
