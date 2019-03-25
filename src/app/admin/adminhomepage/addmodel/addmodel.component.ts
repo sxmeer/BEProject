@@ -46,8 +46,12 @@ export class AddmodelComponent implements OnInit {
     this.total = sum;
   }
   submitModel(){
-    console.log("angular hit")
+    console.log("angular hit");
     this.loginService.getContributors();
+    if(this.total <= 0) {
+      alert('Please Enter Model');
+      return;
+    }
     this.loginService.postModel({
       numberOfQuestions: this.question ,
       questionModelList: this.questionList,

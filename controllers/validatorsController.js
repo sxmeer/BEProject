@@ -7,6 +7,7 @@ var Subjects = require('../models/subjects');
 var Department = require('../models/departments');
 var Questions = require('../models/questions');
 var Validators = require('../models/validators');
+const Status = require('../models/status');
 
 router.post("/login", (req, res, next) => {
     let fetchedUser;
@@ -31,11 +32,13 @@ router.post("/login", (req, res, next) => {
                 "validator_secret_this_should_be_longer",
                 { expiresIn: "1h" }
             );
+            // console.log(fetchedUser);
             res.status(200).json({
                 // token: token,
                 // expiresIn: 3600
                 token: token,
                 id: fetchedUser.id,
+                name: fetchedUser.name,
                 subjectsAssigned: fetchedUser.subjectsAssigned,
                 expiresIn: 3600
             });
@@ -121,5 +124,13 @@ router.get('/markAsInvalidQuestion/:id',(req,res)=>{
         })
     })
 })
+
+router.get('/getSubjectStatus', (req, res) => {
+  const subjectID = req.query.subjectID;
+  Status.findOne({ subjectID })
+    .then(data => {
+      res.status(200).json(data);
+  });
+});
 
 module.exports = router;

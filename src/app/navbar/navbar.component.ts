@@ -10,6 +10,10 @@ import { AdminloginserviceService } from '../admin/adminloginservice.service';
 })
 export class NavbarComponent implements OnInit {
   isLoggedIn: Boolean;
+  isAdmin: Boolean;
+  isContributor: Boolean;
+  isValidator: Boolean;
+  userName: string;
   constructor(private router: Router,
     private validatorlogin: ValidatorloginserviceService,
     private contributorlogin: ContributorloginserviceService,
@@ -17,20 +21,34 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit() {
     this.adminlogin.authStatus.subscribe((authStatus) => {
+      this.isAdmin = true;
       this.isLoggedIn = authStatus;
     });
     this.contributorlogin.authStatus.subscribe((authStatus) => {
+      this.isContributor = true;
       this.isLoggedIn = authStatus;
     });
     this.validatorlogin.authStatus.subscribe((authStatus) => {
+      this.isValidator = true;
       this.isLoggedIn = authStatus;
     });
+    this.adminlogin.userName.subscribe((name) => {
+      this.userName = name;
+    });
+    this.validatorlogin.userName.subscribe((name) => {
+      this.userName = name;
+    });
+    this.contributorlogin.userName.subscribe((name) => {
+      this.userName = name;
+    })
   }
   logOut() {
     this.isLoggedIn = false;
     this.adminlogin.logout();
     this.contributorlogin.logout();
     this.validatorlogin.logout();
+    this.isAdmin = false;
+    this.isContributor = false;
+    this.isValidator = false;
   }
-
 }

@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid" *ngIf="subjectStatus?.validator===1">
   <div class="row">
     <div class="col mt-2">
       <div class="container">
@@ -6,7 +6,7 @@
       </div>
     </div>
     <div class="col mt-2">
-      <button (click)="addQuestion()" class="btn btn-info mb-2">Add Question Component</button>
+      <button (click)="addQuestion()" class="btn btn-info mb-2">Fetch Questions</button>
       <div class="card mb-3" *ngFor="let questions of dataService.Questions">
         <div class="card-body">
             <!-- <strong>Module : </strong> {{questions.module}} <br>
@@ -59,4 +59,9 @@
     </div>
   </div>
 
+</div>
+<div class="container" *ngIf="subjectStatus?.validator===0">
+  <div class="jumbotron">
+    <h1 class="display-3">Validation is Closed</h1>
+    <p class="lead">Once this phase starts you will get notified via email.</p>
 </div>

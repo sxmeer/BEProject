@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 var Courses = require('../models/courses');
 var Subjects = require('../models/subjects');
 var Department = require('../models/departments');
+const Status = require('../models/status');
 
 var Questions = require('../models/questions');
 var checkAuth = require('./middleware/contributor-check-auth');
@@ -36,6 +37,7 @@ router.post("/login", (req, res, next) => {
             res.status(200).json({
                 token: token,
                 id: fetchedUser.id,
+                name: fetchedUser.name,
                 subjectsAssigned: fetchedUser.subjectsAssigned,
                 expiresIn: 3600
             });
@@ -123,5 +125,11 @@ router.post('/addQuestions', function (req, res) {
 //         });
 //     }
 // });
-
+router.get('/getSubjectStatus', (req, res) => {
+  const subjectID = req.query.subjectID;
+  Status.findOne({ subjectID })
+    .then(data => {
+      res.status(200).json(data);
+  });
+})
 module.exports = router;

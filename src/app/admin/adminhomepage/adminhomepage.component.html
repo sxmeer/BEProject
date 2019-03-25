@@ -2,12 +2,12 @@
   <!-- <a routerLink="addvalidators">Validators</a>
   <a routerLink="addcontributors">Contributors</a>
   <a routerLink="addcourses">Courses</a> -->
-  <div class="m-4">
-    <a routerLink="addvalidators" class="btn btn-primary mr-4">Add Validators</a>
-    <a routerLink="addcontributors" class="btn btn-primary mr-4">Add Contributors</a>
-    <a routerLink="addcourses" class="btn btn-primary mr-4">Add Courses</a>
-    <a routerLink="addmodel" class="btn btn-primary mr-4">Add Models</a>
-    <a routerLink="generatePaper" class="btn btn-primary">Generate Paper</a>
-  </div>
+  <!-- <a routerLink="addvalidators" class="btn btn-primary mr-4">Add Validators</a>
+  <a *ngIf="isAdmin" [routerLink]="[{ outlets: { adminOutlet: ['addvalidators'] } }]" class="btn btn-primary mr-4">Add Validators</a> -->
+  <!-- <a routerLink="addcontributors" class="btn btn-primary mr-4">Add Contributors</a>
+  <a routerLink="addcourses" class="btn btn-primary mr-4">Add Courses</a>
+  <a routerLink="addmodel" class="btn btn-primary mr-4">Add Models</a>
+  <a  routerLink="generatePaper" class="btn btn-primary">Generate Paper</a> -->
+
   <router-outlet></router-outlet>
 </div>

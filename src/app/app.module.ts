@@ -28,15 +28,19 @@ import { ValidatorAuthGuardService } from './validators/validator-auth-gaurd.ser
 import { AddmodelComponent } from './admin/adminhomepage/addmodel/addmodel.component';
 import { GeneratepaperComponent } from './admin/adminhomepage/generatepaper/generatepaper.component';
 import { ValidatormoduledescriptionComponent } from './validators/validatorhomepage/validatormoduledescription/validatormoduledescription.component';
+import { InfoAboutQPGComponent } from './info-about-qpg/info-about-qpg.component';
+import { NotificationCenterComponent } from './admin/adminhomepage/notification-center/notification-center.component';
 
 const routes: Routes = [
+  { path: '', component: InfoAboutQPGComponent },
   { path: 'admin/login', component: AdminloginComponent },
   { path: 'admin/homepage', component: AdminhomepageComponent, children:[
     { path: 'addvalidators', component: AddvalidatorComponent },
     { path: 'addcourses', component: AddcourseComponent },
     { path: 'addcontributors', component: AddcontributorComponent },
     { path: 'addmodel', component: AddmodelComponent },
-    { path: 'generatePaper', component: GeneratepaperComponent }
+    { path: 'generatePaper', component: GeneratepaperComponent },
+    { path: 'notificationCenter', component: NotificationCenterComponent }
   ], canActivate:[AdminAuthGuardService] },
   { path: 'validators/login', component: ValidatorloginComponent },
   { path: 'validators/homepage', component: ValidatorhomepageComponent, canActivate:[ValidatorAuthGuardService]},
@@ -61,7 +65,9 @@ const routes: Routes = [
     ContributorquestionComponent,
     AddmodelComponent,
     GeneratepaperComponent,
-    ValidatormoduledescriptionComponent
+    ValidatormoduledescriptionComponent,
+    InfoAboutQPGComponent,
+    NotificationCenterComponent
   ],
   imports: [
     BrowserModule,

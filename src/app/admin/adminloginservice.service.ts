@@ -7,20 +7,24 @@ import { Department } from './department.model';
 import { Subjects } from './subjects.model';
 import { Semester } from './semesters.model';
 import { Models } from './models.model';
+import { Status } from '../contributors/status.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminloginserviceService {
   authenticated = false;
+  name: string;
   private token: string;
   // public models: Models[];
   authStatus = new Subject<Boolean>();
+  public userName = new Subject<string>();
   public departments = new Subject<Department[]>();
   public semesters = new Subject<Semester[]>();
   public subjects = new Subject<Subjects[]>();
   public models = new Subject<Models[]>();
   public subjectData = new Subject();
+  public statusUpdate = new Subject<{ status: Status }>();
   constructor(private http: HttpClient, private router: Router) { }
 
   getToken() {
@@ -56,13 +60,15 @@ export class AdminloginserviceService {
   loginUser(user) {
     console.log(user);
     this.http.post<{ token: string }>('http://localhost:3000/admin/login', user)
-      .subscribe((response) => {
+      .subscribe((response: {expiresIn: number, name: string, token: string}) => {
         console.log(response);
         const token = response.token;
         this.token = token;
+        this.name = response.name;
         if (token) {
           this.authenticated = true;
           this.authStatus.next(true);
+          this.userName.next(this.name);
         }
       },
       (err) => {
@@ -107,6 +113,12 @@ export class AdminloginserviceService {
   getSubjectData(subID) {
     this.http.get('http://localhost:3000/admin/homepage/getSubjectData?subid='+subID).subscribe(data => {
       this.subjectData.next(data);
+    });
+  }
+
+  getSubjectStatus(subID) {
+    this.http.get<{status: Status}>('http://localhost:3000/admin/homepage/getSubjectStatus?subjectID='+subID).subscribe(data => {
+      this.statusUpdate.next(data);
     });
   }
 }

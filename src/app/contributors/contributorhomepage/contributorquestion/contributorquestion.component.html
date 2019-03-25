@@ -12,7 +12,7 @@
             <option>10</option> -->
           <option *ngFor="let number of subjectDetail?.marksType" [ngValue]="number">{{number}}</option>
         </select>
-        <label for="module">module number</label>
+        <label for="module">Module Number</label>
         <select class="form-control" [(ngModel)]="module" name="module" [disabled]="disabled">
           <!-- <option>1</option>
           <option>2</option>
@@ -33,9 +33,9 @@
           <option [ngValue]="2">Comprehension</option>
           <option [ngValue]="1">Application</option>
         </select>
-        <button type="button" *ngIf="!disabled" class="btn btn-success mt-2 mr-2" (click)="lock()">lock</button>
-        <button type="button" *ngIf="disabled" class="btn btn-secondary mt-2 mr-2" (click)="unlock()">Unlock</button>
-        <button type="button" class="btn btn-danger mt-2 mr-2" (click)="remove(child)">remove</button>
+        <button type="button" *ngIf="!disabled" class="btn btn-success mt-2 mr-2" (click)="lock()">&#9919; Lock</button>
+        <button type="button" *ngIf="disabled" class="btn btn-secondary mt-2 mr-2" (click)="unlock()">&#9634; Unlock</button>
+        <button type="button" class="btn btn-danger mt-2 mr-2" (click)="remove(child)">&#10005; Remove</button>
       </div>
     </div>
   </div>

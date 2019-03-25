@@ -11,11 +11,15 @@ import { Subject } from 'rxjs';
 })
 export class ContributorhomepageComponent implements OnInit{
   subjectDetail;
+  subjectStatus;
   constructor(private contributorAddQuestion: ContributoraddquestionserviceService,private loginService: ContributorloginserviceService,private http: HttpClient) { }
   questionList = [1];
   questionCounter = 1;
   ngOnInit() {
-    
+    this.loginService.statusUpdate.subscribe(data => {
+      this.subjectStatus = data;
+    });
+    this.loginService.getSubjectStatus();
   }
   addQuestion() {
     this.questionCounter++;

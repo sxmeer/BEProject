@@ -1,11 +1,11 @@
-<div class="container-fluid">
+<div class="container-fluid" *ngIf="subjectStatus?.contributor===1">
   <div class="row">
-    <div class="col mt-2">
+    <div class="col-md-6 mt-2">
       <div class="container">
         <app-contributormoduledescription></app-contributormoduledescription>
       </div>
     </div>
-    <div class="col mt-2">
+    <div class="col-md-6 mt-2">
       <button (click)="addQuestion()" class="btn btn-info mb-2">Add Question Component</button>
       <div id="quesContainer">
         <div id="question-container">
@@ -16,4 +16,9 @@
       <button (click)="submitQuestions()" class="mt-2 btn btn-outline-warning">Submit</button>
     </div>
   </div>
+</div>
+<div class="container" *ngIf="subjectStatus?.contributor===0">
+  <div class="jumbotron">
+    <h1 class="display-3">Submission Closed</h1>
+    <p class="lead">Once submission starts you will get notified via email.</p>
 </div>

@@ -7,6 +7,7 @@ const nodemailer = require("nodemailer");
 const Admin = require("../models/admin");
 const Departments = require("../models/departments");
 const Subjects = require("../models/subjects");
+const Status = require('../models/status');
 var Validators = require("../models/validators");
 var Contributors = require("../models/contributors");
 var Courses = require("../models/courses");
@@ -56,6 +57,7 @@ router.post("/login", (req, res, next) => {
       );
       res.status(200).json({
         token: token,
+        name: fetchedUser.name,
         expiresIn: 3600
       });
     })
@@ -1069,6 +1071,14 @@ router.get("/homepage/getSubjectData", (req, res) => {
   const subId = req.query.subid;
   Courses.findOne({ subId }).then(data => {
     res.status(200).json(data);
+  });
+});
+
+router.get('/homepage/getSubjectStatus', (req, res) => {
+  const subjectID = req.query.subjectID;
+  Status.findOne({ subjectID })
+    .then(data => {
+      res.status(200).json(data);
   });
 });
 
