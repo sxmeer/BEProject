@@ -22,6 +22,7 @@ export class NotificationCenterComponent implements OnInit {
   buttonValue = '';
   subjectStatus;
   showButton = false;
+  alertMessage;
   constructor(private adminLoginService: AdminloginserviceService) { }
 
   ngOnInit() {
@@ -39,7 +40,10 @@ export class NotificationCenterComponent implements OnInit {
       console.log(data);
       this.subjectStatus = data;
       this.diplayAppropriateFunction();
-    })
+    });
+    this.adminLoginService.createStatusResponse.subscribe(data => {
+      console.log(JSON.stringify(data));
+    });
   }
 
   onDepartmentSelected() {
@@ -51,6 +55,7 @@ export class NotificationCenterComponent implements OnInit {
 
   checkSubjectStatus() {
     this.adminLoginService.getSubjectStatus(this.notificationDetail.subId);
+    this.diplayAppropriateFunction();
   }
 
   diplayAppropriateFunction() {
@@ -81,8 +86,33 @@ export class NotificationCenterComponent implements OnInit {
 
   onSubmit() {
     if (this.subjectStatus === null) {
-
+      // console.log('OnSubmit Clicked');
+      if (this.notificationDetail.type === 'contributor') {
+        // console.log('Contributor Status Clicked');
+        this.adminLoginService.createStatus(this.notificationDetail.subId, this.notificationDetail.type);
+      } else if (this.notificationDetail.type === 'validator') {
+        this.adminLoginService.createStatus(this.notificationDetail.subId, this.notificationDetail.type);
+      }
+    } else if (this.subjectStatus !== null) {
+      if (this.notificationDetail.type === 'contributor') {
+        if(this.subjectStatus.contributor === 1) {
+          this.adminLoginService.updateStatus(this.notificationDetail.subId, this.notificationDetail.type, 0);
+          // this.buttonValue = 'Stop Contribution Phase';
+        } else {
+          // this.buttonValue = 'Start Contribution Phase';
+          this.adminLoginService.updateStatus(this.notificationDetail.subId, this.notificationDetail.type, 1);
+        }
+      }
+      if (this.notificationDetail.type === 'validator') {
+        if(this.subjectStatus.validator === 1) {
+          this.adminLoginService.updateStatus(this.notificationDetail.subId, this.notificationDetail.type, 0);
+          // this.buttonValue = 'Stop Validation Phase';
+        } else {
+          this.adminLoginService.updateStatus(this.notificationDetail.subId, this.notificationDetail.type, 1);
+          // this.buttonValue = 'Start Validation Phase';
+        }
+      }
     }
+    this.checkSubjectStatus();
   }
-
 }

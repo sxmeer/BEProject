@@ -3,16 +3,15 @@ const mongoose = require('mongoose');
 const Status = mongoose.Schema({
   subjectID: {
     type: Number,
+    unique: true,
     required: true
   },
   contributor: {
     type: Number,
-    required: true,
     default: 0
   },
   validator: {
     type: Number,
-    required: true,
     default: 0
   }
 });

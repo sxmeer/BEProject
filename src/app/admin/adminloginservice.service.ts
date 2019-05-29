@@ -25,6 +25,7 @@ export class AdminloginserviceService {
   public models = new Subject<Models[]>();
   public subjectData = new Subject();
   public statusUpdate = new Subject<{ status: Status }>();
+  public createStatusResponse = new Subject();
   constructor(private http: HttpClient, private router: Router) { }
 
   getToken() {
@@ -119,6 +120,21 @@ export class AdminloginserviceService {
   getSubjectStatus(subID) {
     this.http.get<{status: Status}>('http://localhost:3000/admin/homepage/getSubjectStatus?subjectID='+subID).subscribe(data => {
       this.statusUpdate.next(data);
+    });
+  }
+
+  createStatus(subjectID, user) {
+    // console.log('subjectID: '+subjectID);
+    // console.log('user: '+user);
+    this.http.post('http://localhost:3000/admin/homepage/createStatus', {subjectID, user}).subscribe(data => {
+    // console.log('login Service: Hit CreateStatus');
+    this.createStatusResponse.next(data);
+    });
+  }
+
+  updateStatus(subjectID, user, newValue) {
+    this.http.post('http://localhost:3000/admin/homepage/updateStatus', {subjectID, user, newValue}).subscribe(data => {
+      this.createStatusResponse.next(data);
     });
   }
 }

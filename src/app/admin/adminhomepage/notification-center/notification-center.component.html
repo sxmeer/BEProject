@@ -24,7 +24,7 @@
 
                 <div class="form-group">
                   <label for="coursename">Course Name</label>
-                  <select name="coursename" id="coursename" [(ngModel)]="notificationDetail.subId" class="form-control" required>
+                  <select name="coursename" id="coursename" [(ngModel)]="notificationDetail.subId" class="form-control" (click)="checkSubjectStatus()" required>
                       <option *ngFor="let sub of subjects" [value]="sub.subID">{{ sub.name }}</option>
                     </select>
                 </div>

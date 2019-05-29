@@ -971,7 +971,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
         };
         var printer = new pdfMakePrinter(fontDescriptors);
         var doc = printer.createPdfKitDocument(documentDefinition);
-        var link = `D:/BE/BE project/QuestionPaperGeneratorV1/new/Media/QuestionPaper-${new Date().getTime()}.pdf`;
+        var link = `D:/Projects/BEProject/Media/QuestionPaper-${new Date().getTime()}.pdf`;
         doc.pipe(
           fs.createWriteStream(link).on("error", err => {
             console.log(err.message);
@@ -982,9 +982,9 @@ router.post("/homepage/generatePaper", (req, res, next) => {
           console.log("PDF successfully created and stored");
           const mailOptions = {
             from: "wtlminiproject84@gmail.com",
-            to: "sameeryadav2421@gmail.com",
+            to: "sanjeev1996s@gmail.com",
             subject: "Generated Paper",
-            text: "checkout the attached pdf",
+            text: "Checkout the attached Question Paper",
             attachments: [
               {
                 filename: "paper.pdf",
@@ -1074,7 +1074,7 @@ router.post("/homepage/generatePaper", (req, res, next) => {
             if (flag) {
               unsuccessfullUpdate(0, () => {
                 console.log("not enough questions");
-                res.status(404).json({
+                res.status(200).json({
                   msg: "not enough questions"
                 });
               });
@@ -1150,6 +1150,60 @@ router.get('/homepage/getSubjectStatus', (req, res) => {
     .then(data => {
       res.status(200).json(data);
   });
+});
+
+router.post('/homepage/createStatus', (req,res) => {
+  subjectID = req.body.subjectID;
+  user = req.body.user;
+  console.log('req: '+JSON.stringify(req.body, undefined, 2));
+  let newStatus = new Status({
+    subjectID: subjectID,
+    contributor: 0,
+    validator: 0
+  });
+  if (user === 'contributor') {
+    newStatus.contributor = 1;
+  } else if (user === 'validator') {
+    newStatus.validator = 1;
+  }
+  console.log(JSON.stringify(newStatus, undefined, 2));
+  newStatus.save()
+  .then((doc, err) => {
+    if(err) {
+      console.log("Error : "+err);
+      res.json({error: 'Error saving document'});
+    } else {
+      res.json({result: 'Status Changed'});
+    }
+  })
+});
+
+router.post('/homepage/updateStatus', (req,res) => {
+  subjectID = req.body.subjectID;
+  user = req.body.user;
+  newValue = req.body.newValue;
+  // console.log(JSON.stringify(newStatus, undefined, 2));
+  if(user === 'contributor') {
+    Status.findOneAndUpdate({subjectID}, {$set : {contributor : newValue}}, (err, doc) => {
+      if (err) {
+        console.log("Something wrong when updating data!");
+        res.status(200).json({err: 'Error updating document'});
+      } else {
+        console.log(doc)
+        res.status(200).json({success: 'Status updated'});
+      }
+    })
+  } else if (user === 'validator') {
+    Status.findOneAndUpdate({subjectID}, {$set : {validator : newValue}}, (err, doc) => {
+      if (err) {
+        console.log("Something wrong when updating data!");
+        res.status(200).json({err: 'Error updating document'});
+      } else {
+        console.log(doc)
+        res.status(200).json({success: 'Status updated'});
+      }
+    })
+  }
 });
 
 module.exports = router;
