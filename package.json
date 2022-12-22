@@ -31,7 +31,7 @@
     "fkill": "^6.0.0",
     "fs": "0.0.1-security",
     "generate-password": "^1.4.1",
-    "jsonwebtoken": "^8.4.0",
+    "jsonwebtoken": "^9.0.0",
     "mongodb": "^3.1.6",
     "mongoose": "^5.1.2",
     "mongoose-unique-validator": "^2.0.2",
